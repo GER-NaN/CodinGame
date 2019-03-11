@@ -18,8 +18,13 @@ namespace CodeAlaMode
         public Table IceCream;
         public Table Strawberry;
         public Table Chopping;
+        public Table Dough;
+        public Table Oven;
 
-        public Table ChoppedStrawberry;//When I set it down 
+        //When I set it down, maybe dont need this
+        public Table ChoppedStrawberry;
+        public Table CookedDough;
+        public int CookTime;
         
         public List<Table> Tables = new List<Table>();
     }
@@ -106,6 +111,8 @@ namespace CodeAlaMode
                     if (kitchenLine[x] == 'B') game.Blueberry = new Table { Position = new Position(x, i), HasFunction = true };
                     if (kitchenLine[x] == 'S') game.Strawberry = new Table { Position = new Position(x, i), HasFunction = true };
                     if (kitchenLine[x] == 'C') game.Chopping = new Table { Position = new Position(x, i), HasFunction = true };
+                    if (kitchenLine[x] == 'H') game.Dough = new Table { Position = new Position(x, i), HasFunction = true };
+                    if (kitchenLine[x] == 'O') game.Oven = new Table { Position = new Position(x, i), HasFunction = true };
                     if (kitchenLine[x] == '#') game.Tables.Add(new Table { Position = new Position(x, i) });
                 }
             }
@@ -149,7 +156,7 @@ namespace CodeAlaMode
 
             // KITCHEN INPUT
             var game = ReadGame();
-            var step = -5;
+            var step = -11;
             while (true)
             {
                 int turnsRemaining = int.Parse(ReadLine());
@@ -192,6 +199,33 @@ namespace CodeAlaMode
                 var stepDone = false;
                 switch (step)
                 {
+                    case -11:
+                        stepDone = myChef.CanReach(game.Dough);
+                        break;
+                    case -10:
+                        stepDone = true;
+                        break;
+                    case -9:
+                        stepDone = myChef.CanReach(game.Oven);
+
+                        break;
+                    case -8:
+                        if (game.CookTime == 10)
+                        {
+                            stepDone = true;
+                            game.CookTime = 0;
+                        }
+                        else
+                        {
+                            game.CookTime++;
+                        }
+                        break;
+                    case -7:
+                        stepDone = myChef.CanReach(game.CookedDough);
+                        break;
+                    case -6:
+                        stepDone = true;
+                        break;
                     case -5:
                         stepDone = myChef.CanReach(game.Strawberry);
                         break;
@@ -245,9 +279,16 @@ namespace CodeAlaMode
                         break;
 
                     case 9:
-                        stepDone = myChef.CanReach(game.Window);
+                        stepDone = myChef.CanReach(game.CookedDough);
                         break;
                     case 10:
+                        stepDone = true;
+                        break;
+
+                    case 11:
+                        stepDone = myChef.CanReach(game.Window);
+                        break;
+                    case 12:
                         stepDone = true;
                         break;
                 }
@@ -258,13 +299,60 @@ namespace CodeAlaMode
                     step++;
 
                     //We have delivered to the window, reset
-                    if (step > 10)
+                    if (step > 12)
                     {
-                        step = -5;
+                        step = -11;
                     }
                 }
 
+                if(step == -11)
+                {
+                    Console.WriteLine("MOVE " + game.Dough.Position.ToString() + ";Move Dough");
+                }
+                if(step == -10)
+                {
+                    Console.WriteLine("USE " + game.Dough.Position.ToString() + ";Use Dough");
+                }
+                if (step == -9)
+                {
+                    Console.WriteLine("MOVE " + game.Oven.Position.ToString() + ";Move Oven");
+                }
+                if (step == -8)
+                {
+                    if(game.CookTime == 1)
+                    {
+                        Console.WriteLine("USE " + game.Oven.Position.ToString() + ";Use Oven"); //Put the dough in
+                    }
+                    else if(game.CookTime < 10)
+                    {
+                        Console.WriteLine("WAIT");
+                    }
+                    else
+                    {
+                        Console.WriteLine("USE " + game.Oven.Position.ToString() + ";Use Oven"); //Get dough out
+                    }
+                }
+                if (step == -7)
+                {
+                    if (game.CookedDough == null)
+                    {
+                        //Find an empty spot
+                        foreach (var t in game.Tables.OrderByDescending(t => myChef.Position.Manhattan(t.Position)))
+                        {
+                            if (t.Item == null)
+                            {
+                                game.CookedDough = t;
+                                break;
+                            }
+                        }
+                    }
 
+                    Console.WriteLine("MOVE " + game.CookedDough.Position.ToString() + ";MOVE Empty (Cooked Dough)");
+                }
+                if (step == -6)
+                {
+                    Console.WriteLine("USE " + game.CookedDough.Position.ToString() + ";USE Cooked Dough (Set down)");
+                }
                 if (step == -5)
                 {
                     //Go to strawberry
@@ -355,17 +443,30 @@ namespace CodeAlaMode
                     Console.WriteLine("USE " + game.ChoppedStrawberry.Position.ToString() + ";USE Chopped Strawberry");
                     game.ChoppedStrawberry = null;
                 }
-                
+
                 if (step == 9)
+                {
+                    //Move to chipped strawberry
+                    Console.WriteLine("MOVE " + game.CookedDough.Position.ToString() + ";Move Cooked Dough");
+                }
+                if (step == 10)
+                {
+                    //Use chopped strawberry
+                    Console.WriteLine("USE " + game.CookedDough.Position.ToString() + ";Get Cooked Dough");
+                    game.CookedDough = null;
+                }
+
+                if (step == 11)
                 {
                     //Move to Window
                     Console.WriteLine("MOVE " + game.Window.Position.X + " " + game.Window.Position.Y + "; Move Window");
                 }
-                if (step == 10)
+                if (step == 12)
                 {
                     //Use to Window
                     Console.WriteLine("USE " + game.Window.Position.X + " " + game.Window.Position.Y + "; Use Window");
                 }
+
 
             }
         }
