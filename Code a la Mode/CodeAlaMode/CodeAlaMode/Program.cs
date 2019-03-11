@@ -307,29 +307,29 @@ namespace CodeAlaMode
 
                 if(step == -11)
                 {
-                    Console.WriteLine("MOVE " + game.Dough.Position.ToString() + ";Move Dough");
+                    Console.WriteLine("MOVE " + game.Dough.Position.ToString() + ";GOTO Dough");
                 }
                 if(step == -10)
                 {
-                    Console.WriteLine("USE " + game.Dough.Position.ToString() + ";Use Dough");
+                    Console.WriteLine("USE " + game.Dough.Position.ToString() + ";Pickup Dough");
                 }
                 if (step == -9)
                 {
-                    Console.WriteLine("MOVE " + game.Oven.Position.ToString() + ";Move Oven");
+                    Console.WriteLine("MOVE " + game.Oven.Position.ToString() + ";GOTO Oven");
                 }
                 if (step == -8)
                 {
                     if(game.CookTime == 1)
                     {
-                        Console.WriteLine("USE " + game.Oven.Position.ToString() + ";Use Oven"); //Put the dough in
+                        Console.WriteLine("USE " + game.Oven.Position.ToString() + ";Use Oven - Put Dough"); //Put the dough in
                     }
                     else if(game.CookTime < 10)
                     {
-                        Console.WriteLine("WAIT");
+                        Console.WriteLine("WAIT; Dough Cooking");
                     }
                     else
                     {
-                        Console.WriteLine("USE " + game.Oven.Position.ToString() + ";Use Oven"); //Get dough out
+                        Console.WriteLine("USE " + game.Oven.Position.ToString() + ";Use Oven - Get crissont"); //Get dough out
                     }
                 }
                 if (step == -7)
@@ -347,34 +347,34 @@ namespace CodeAlaMode
                         }
                     }
 
-                    Console.WriteLine("MOVE " + game.CookedDough.Position.ToString() + ";MOVE Empty (Cooked Dough)");
+                    Console.WriteLine("MOVE " + game.CookedDough.Position.ToString() + ";GOTO Empty spot");
                 }
                 if (step == -6)
                 {
-                    Console.WriteLine("USE " + game.CookedDough.Position.ToString() + ";USE Cooked Dough (Set down)");
+                    Console.WriteLine("USE " + game.CookedDough.Position.ToString() + ";Set DOwn Crissount");
                 }
                 if (step == -5)
                 {
                     //Go to strawberry
-                    Console.WriteLine("MOVE " + game.Strawberry.Position.ToString() + ";Move Strawberry");
+                    Console.WriteLine("MOVE " + game.Strawberry.Position.ToString() + ";GOTO Strawberry");
                 }
 
                 if(step == -4)
                 {
                     //Use Strawberry
-                    Console.WriteLine("USE " + game.Strawberry.Position.ToString() + ";Use Strawberry");
+                    Console.WriteLine("USE " + game.Strawberry.Position.ToString() + ";PICK UP Strawberry");
                 }
 
                 if (step == -3)
                 {
                     //Go to chopping
-                    Console.WriteLine("MOVE " + game.Chopping.Position.ToString() + ";Move Chopping");
+                    Console.WriteLine("MOVE " + game.Chopping.Position.ToString() + ";GOTO Chopping");
                 }
 
                 if (step == -2)
                 {
                     //Use Chopping
-                    Console.WriteLine("USE " + game.Chopping.Position.ToString() + ";Use Chopping");
+                    Console.WriteLine("USE " + game.Chopping.Position.ToString() + ";CHOP Strawberry");
                 }
 
                 if (step == -1)//Move empty spot
@@ -391,13 +391,13 @@ namespace CodeAlaMode
                             }
                         }
                     }
-                    Console.WriteLine("MOVE " + game.ChoppedStrawberry.Position.ToString() + ";Move Empty Spot");
+                    Console.WriteLine("MOVE " + game.ChoppedStrawberry.Position.ToString() + ";GOTO Empty");
                 }
 
                 if (step == 0)
                 {
                     //Use empty spot
-                    Console.WriteLine("USE " + game.ChoppedStrawberry.Position.ToString() + ";Use Empty Spot - Place Strawberry)");
+                    Console.WriteLine("USE " + game.ChoppedStrawberry.Position.ToString() + ";DROP Strawberry)");
                 }
 
                    //**************************
@@ -405,66 +405,66 @@ namespace CodeAlaMode
                 if (step == 1)
                 {
                     //Go to Dishwasher
-                    Console.WriteLine("MOVE " + game.Dishwasher.Position.X + " " + game.Dishwasher.Position.Y + ";Move dishwasher");
+                    Console.WriteLine("MOVE " + game.Dishwasher.Position.X + " " + game.Dishwasher.Position.Y + ";GOTO dishwasher");
                 }
                 if (step == 2)
                 {
                     //USE th Dishwasher
-                    Console.WriteLine("USE " + game.Dishwasher.Position.X + " " + game.Dishwasher.Position.Y + ";Use dishwasher");
+                    Console.WriteLine("USE " + game.Dishwasher.Position.X + " " + game.Dishwasher.Position.Y + ";GET PLATE");
                 }
                 if (step == 3)
                 {
                     //Go to Blueberry
-                    Console.WriteLine("MOVE " + game.Blueberry.Position.X + " " + game.Blueberry.Position.Y + ";Move blueberries");
+                    Console.WriteLine("MOVE " + game.Blueberry.Position.X + " " + game.Blueberry.Position.Y + ";GOTO blueberries");
                 }
                 if (step == 4)
                 {
-                    Console.WriteLine("USE " + game.Blueberry.Position.X + " " + game.Blueberry.Position.Y + ";Use blueberries");
+                    Console.WriteLine("USE " + game.Blueberry.Position.X + " " + game.Blueberry.Position.Y + ";PICK UP blueberries");
                 }
                 if (step == 5)
                 {
                     //Move to icecream
-                    Console.WriteLine("MOVE " + game.IceCream.Position.X + " " + game.IceCream.Position.Y + "; Move Icecream");
+                    Console.WriteLine("MOVE " + game.IceCream.Position.X + " " + game.IceCream.Position.Y + "; GOTO Icecream");
                 }
                 if (step == 6)
                 {
                     //Use to icecream
-                    Console.WriteLine("USE " + game.IceCream.Position.X + " " + game.IceCream.Position.Y + "; Use Icecream");
+                    Console.WriteLine("USE " + game.IceCream.Position.X + " " + game.IceCream.Position.Y + "; PICK UP Icecream");
                 }
 
                 if (step == 7)
                 {
                     //Move to chipped strawberry
-                    Console.WriteLine("MOVE " + game.ChoppedStrawberry.Position.ToString() + ";Move Chopped Strawberry");
+                    Console.WriteLine("MOVE " + game.ChoppedStrawberry.Position.ToString() + ";GOTO Chopped Strawberry");
                 }
                 if (step == 8)
                 {
                     //Use chopped strawberry
-                    Console.WriteLine("USE " + game.ChoppedStrawberry.Position.ToString() + ";USE Chopped Strawberry");
+                    Console.WriteLine("USE " + game.ChoppedStrawberry.Position.ToString() + ";Pick Up Chopped Strawberry");
                     game.ChoppedStrawberry = null;
                 }
 
                 if (step == 9)
                 {
-                    //Move to chipped strawberry
-                    Console.WriteLine("MOVE " + game.CookedDough.Position.ToString() + ";Move Cooked Dough");
+                    //Move to Cooked
+                    Console.WriteLine("MOVE " + game.CookedDough.Position.ToString() + ";GOTO Cooked Dough");
                 }
                 if (step == 10)
                 {
                     //Use chopped strawberry
-                    Console.WriteLine("USE " + game.CookedDough.Position.ToString() + ";Get Cooked Dough");
+                    Console.WriteLine("USE " + game.CookedDough.Position.ToString() + ";PICK UP Cooked Dough");
                     game.CookedDough = null;
                 }
 
                 if (step == 11)
                 {
                     //Move to Window
-                    Console.WriteLine("MOVE " + game.Window.Position.X + " " + game.Window.Position.Y + "; Move Window");
+                    Console.WriteLine("MOVE " + game.Window.Position.X + " " + game.Window.Position.Y + "; GOTO Window");
                 }
                 if (step == 12)
                 {
                     //Use to Window
-                    Console.WriteLine("USE " + game.Window.Position.X + " " + game.Window.Position.Y + "; Use Window");
+                    Console.WriteLine("USE " + game.Window.Position.X + " " + game.Window.Position.Y + "; SET PLATE DOWN");
                 }
 
 
