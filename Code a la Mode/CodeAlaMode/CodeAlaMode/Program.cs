@@ -18,6 +18,9 @@ namespace CodeAlaMode
         public Table IceCream;
         public Table Strawberry;
         public Table Chopping;
+
+        public Table ChoppedStrawberry;//When I set it down 
+        
         public List<Table> Tables = new List<Table>();
     }
 
@@ -52,6 +55,13 @@ namespace CodeAlaMode
         {
             Position = position;
             Item = item;
+        }
+
+        public bool CanReach(Table t)
+        {
+            //Pythagorean theorm
+            var distance = Math.Sqrt(Math.Pow(Position.X - t.Position.X, 2) + Math.Pow(Position.Y - t.Position.Y, 2));
+            return (distance <= 1.5);
         }
     }
 
@@ -139,7 +149,7 @@ namespace CodeAlaMode
 
             // KITCHEN INPUT
             var game = ReadGame();
-            var step = 1;
+            var step = -5;
             while (true)
             {
                 int turnsRemaining = int.Parse(ReadLine());
@@ -182,11 +192,27 @@ namespace CodeAlaMode
                 var stepDone = false;
                 switch (step)
                 {
+                    case -5:
+                        stepDone = myChef.CanReach(game.Strawberry);
+                        break;
+                    case -4:
+                        stepDone = true;
+                        break;
+                    case -3:
+                        stepDone = myChef.CanReach(game.Chopping);
+                        break;
+                    case -2:
+                        stepDone = true;
+                        break;
+                    case -1:
+                        stepDone = myChef.CanReach(game.ChoppedStrawberry);
+                        break;
+                    case 0:
+                        stepDone = true;
+                        break;
+
                     case 1:
-                        if (PositionsWithinReach(myChef.Position, game.Dishwasher.Position))
-                        {
-                            stepDone = true;
-                        }
+                        stepDone = myChef.CanReach(game.Dishwasher);
                         break;
 
                     case 2:
@@ -194,10 +220,7 @@ namespace CodeAlaMode
                         break;
 
                     case 3:
-                        if (PositionsWithinReach(myChef.Position, game.Blueberry.Position))
-                        {
-                            stepDone = true;
-                        }
+                        stepDone = myChef.CanReach(game.Blueberry);
                         break;
 
                     case 4:
@@ -205,10 +228,8 @@ namespace CodeAlaMode
                         break;
 
                     case 5:
-                        if (PositionsWithinReach(myChef.Position, game.IceCream.Position))
-                        {
-                            stepDone = true;
-                        }
+                        stepDone = myChef.CanReach(game.IceCream);
+                        
                         break;
 
                     case 6:
@@ -216,13 +237,17 @@ namespace CodeAlaMode
                         break;
 
                     case 7:
-                        if (PositionsWithinReach(myChef.Position, game.Window.Position))
-                        {
-                            stepDone = true;
-                        }
+                        stepDone = myChef.CanReach(game.ChoppedStrawberry);
                         break;
 
                     case 8:
+                        stepDone = true;
+                        break;
+
+                    case 9:
+                        stepDone = myChef.CanReach(game.Window);
+                        break;
+                    case 10:
                         stepDone = true;
                         break;
                 }
@@ -233,12 +258,61 @@ namespace CodeAlaMode
                     step++;
 
                     //We have delivered to the window, reset
-                    if (step > 8)
+                    if (step > 10)
                     {
-                        step = 1;
+                        step = -5;
                     }
                 }
 
+
+                if (step == -5)
+                {
+                    //Go to strawberry
+                    Console.WriteLine("MOVE " + game.Strawberry.Position.ToString() + ";Move Strawberry");
+                }
+
+                if(step == -4)
+                {
+                    //Use Strawberry
+                    Console.WriteLine("USE " + game.Strawberry.Position.ToString() + ";Use Strawberry");
+                }
+
+                if (step == -3)
+                {
+                    //Go to chopping
+                    Console.WriteLine("MOVE " + game.Chopping.Position.ToString() + ";Move Chopping");
+                }
+
+                if (step == -2)
+                {
+                    //Use Chopping
+                    Console.WriteLine("USE " + game.Chopping.Position.ToString() + ";Use Chopping");
+                }
+
+                if (step == -1)//Move empty spot
+                {
+                    if(game.ChoppedStrawberry == null)
+                    {
+                        //Find an empty spot
+                        foreach(var t in game.Tables.OrderByDescending(t => myChef.Position.Manhattan(t.Position)))
+                        {
+                            if(t.Item == null)
+                            {
+                                game.ChoppedStrawberry = t;
+                                break;
+                            }
+                        }
+                    }
+                    Console.WriteLine("MOVE " + game.ChoppedStrawberry.Position.ToString() + ";Move Empty Spot");
+                }
+
+                if (step == 0)
+                {
+                    //Use empty spot
+                    Console.WriteLine("USE " + game.ChoppedStrawberry.Position.ToString() + ";Use Empty Spot - Place Strawberry)");
+                }
+
+                   //**************************
 
                 if (step == 1)
                 {
@@ -269,12 +343,25 @@ namespace CodeAlaMode
                     //Use to icecream
                     Console.WriteLine("USE " + game.IceCream.Position.X + " " + game.IceCream.Position.Y + "; Use Icecream");
                 }
+
                 if (step == 7)
+                {
+                    //Move to chipped strawberry
+                    Console.WriteLine("MOVE " + game.ChoppedStrawberry.Position.ToString() + ";Move Chopped Strawberry");
+                }
+                if (step == 8)
+                {
+                    //Use chopped strawberry
+                    Console.WriteLine("USE " + game.ChoppedStrawberry.Position.ToString() + ";USE Chopped Strawberry");
+                    game.ChoppedStrawberry = null;
+                }
+                
+                if (step == 9)
                 {
                     //Move to Window
                     Console.WriteLine("MOVE " + game.Window.Position.X + " " + game.Window.Position.Y + "; Move Window");
                 }
-                if (step == 8)
+                if (step == 10)
                 {
                     //Use to Window
                     Console.WriteLine("USE " + game.Window.Position.X + " " + game.Window.Position.Y + "; Use Window");
