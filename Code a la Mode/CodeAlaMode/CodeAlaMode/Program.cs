@@ -27,6 +27,8 @@ namespace CodeAlaMode
         public int CookTime;
         
         public List<Table> Tables = new List<Table>();
+
+        public Player MyChef;
     }
 
     public class Table
@@ -34,16 +36,31 @@ namespace CodeAlaMode
         public Position Position;
         public bool HasFunction;
         public Item Item;
+
+        public bool IsEmpty()
+        {
+            return Item == null;
+        }
     }
 
     public class Item
     {
         public string Content;
-        public bool HasPlate;
+        public bool IsPlate;
         public Item(string content)
         {
             Content = content;
-            HasPlate = Content.Contains(MainClass.Dish);
+            IsPlate = Content.Contains(MainClass.Dish);
+        }
+
+        public bool HasDough()
+        {
+            return Content.Contains(MainClass.Dough);
+        }
+
+        public bool HasCroissant()
+        {
+            return Content.Contains(MainClass.Croissant);
         }
     }
 
@@ -93,6 +110,12 @@ namespace CodeAlaMode
     {
         public static bool Debug = true;
         public const string Dish = "DISH";
+        public const string Dough = "DOUGH";
+        public const string Croissant = "CROISSANT";
+        public const string Blueberries = "BLUEBERRIES";
+        public const string IceCream = "ICE_CREAM";
+        public const string ChoppedStrawberries = "CHOPPED_STRAWBERRIES";
+
 
         public static Game ReadGame()
         {
@@ -192,284 +215,158 @@ namespace CodeAlaMode
                 }
 
                 // GAME LOGIC
-                var myChef = game.Players[0];
+                game.MyChef = game.Players[0];
 
-
-                //Check if we completed our step, if so then we move on
-                var stepDone = false;
-                switch (step)
-                {
-                    case -11:
-                        stepDone = myChef.CanReach(game.Dough);
-                        break;
-                    case -10:
-                        stepDone = true;
-                        break;
-                    case -9:
-                        stepDone = myChef.CanReach(game.Oven);
-
-                        break;
-                    case -8:
-                        if (game.CookTime == 10)
-                        {
-                            stepDone = true;
-                            game.CookTime = 0;
-                        }
-                        else
-                        {
-                            game.CookTime++;
-                        }
-                        break;
-                    case -7:
-                        stepDone = myChef.CanReach(game.CookedDough);
-                        break;
-                    case -6:
-                        stepDone = true;
-                        break;
-                    case -5:
-                        stepDone = myChef.CanReach(game.Strawberry);
-                        break;
-                    case -4:
-                        stepDone = true;
-                        break;
-                    case -3:
-                        stepDone = myChef.CanReach(game.Chopping);
-                        break;
-                    case -2:
-                        stepDone = true;
-                        break;
-                    case -1:
-                        stepDone = myChef.CanReach(game.ChoppedStrawberry);
-                        break;
-                    case 0:
-                        stepDone = true;
-                        break;
-
-                    case 1:
-                        stepDone = myChef.CanReach(game.Dishwasher);
-                        break;
-
-                    case 2:
-                        stepDone = true;//If we get to step 2 that means we were able to execute it and it should always succeed
-                        break;
-
-                    case 3:
-                        stepDone = myChef.CanReach(game.Blueberry);
-                        break;
-
-                    case 4:
-                        stepDone = true;
-                        break;
-
-                    case 5:
-                        stepDone = myChef.CanReach(game.IceCream);
-                        
-                        break;
-
-                    case 6:
-                        stepDone = true;//If we get to step 2 that means we were able to execute it and it should always succeed
-                        break;
-
-                    case 7:
-                        stepDone = myChef.CanReach(game.ChoppedStrawberry);
-                        break;
-
-                    case 8:
-                        stepDone = true;
-                        break;
-
-                    case 9:
-                        stepDone = myChef.CanReach(game.CookedDough);
-                        break;
-                    case 10:
-                        stepDone = true;
-                        break;
-
-                    case 11:
-                        stepDone = myChef.CanReach(game.Window);
-                        break;
-                    case 12:
-                        stepDone = true;
-                        break;
-                }
-
-                //If our current step is done, move to the next one
-                if (stepDone)
-                {
-                    step++;
-
-                    //We have delivered to the window, reset
-                    if (step > 12)
-                    {
-                        step = -11;
-                    }
-                }
-
-                if(step == -11)
-                {
-                    Console.WriteLine("MOVE " + game.Dough.Position.ToString() + ";GOTO Dough");
-                }
-                if(step == -10)
-                {
-                    Console.WriteLine("USE " + game.Dough.Position.ToString() + ";Pickup Dough");
-                }
-                if (step == -9)
-                {
-                    Console.WriteLine("MOVE " + game.Oven.Position.ToString() + ";GOTO Oven");
-                }
-                if (step == -8)
-                {
-                    if(game.CookTime == 1)
-                    {
-                        Console.WriteLine("USE " + game.Oven.Position.ToString() + ";Use Oven - Put Dough"); //Put the dough in
-                    }
-                    else if(game.CookTime < 10)
-                    {
-                        Console.WriteLine("WAIT; Dough Cooking");
-                    }
-                    else
-                    {
-                        Console.WriteLine("USE " + game.Oven.Position.ToString() + ";Use Oven - Get crissont"); //Get dough out
-                    }
-                }
-                if (step == -7)
-                {
-                    if (game.CookedDough == null)
-                    {
-                        //Find an empty spot
-                        foreach (var t in game.Tables.OrderByDescending(t => myChef.Position.Manhattan(t.Position)))
-                        {
-                            if (t.Item == null)
-                            {
-                                game.CookedDough = t;
-                                break;
-                            }
-                        }
-                    }
-
-                    Console.WriteLine("MOVE " + game.CookedDough.Position.ToString() + ";GOTO Empty spot");
-                }
-                if (step == -6)
-                {
-                    Console.WriteLine("USE " + game.CookedDough.Position.ToString() + ";Set DOwn Crissount");
-                }
-                if (step == -5)
-                {
-                    //Go to strawberry
-                    Console.WriteLine("MOVE " + game.Strawberry.Position.ToString() + ";GOTO Strawberry");
-                }
-
-                if(step == -4)
-                {
-                    //Use Strawberry
-                    Console.WriteLine("USE " + game.Strawberry.Position.ToString() + ";PICK UP Strawberry");
-                }
-
-                if (step == -3)
-                {
-                    //Go to chopping
-                    Console.WriteLine("MOVE " + game.Chopping.Position.ToString() + ";GOTO Chopping");
-                }
-
-                if (step == -2)
-                {
-                    //Use Chopping
-                    Console.WriteLine("USE " + game.Chopping.Position.ToString() + ";CHOP Strawberry");
-                }
-
-                if (step == -1)//Move empty spot
-                {
-                    if(game.ChoppedStrawberry == null)
-                    {
-                        //Find an empty spot
-                        foreach(var t in game.Tables.OrderByDescending(t => myChef.Position.Manhattan(t.Position)))
-                        {
-                            if(t.Item == null)
-                            {
-                                game.ChoppedStrawberry = t;
-                                break;
-                            }
-                        }
-                    }
-                    Console.WriteLine("MOVE " + game.ChoppedStrawberry.Position.ToString() + ";GOTO Empty");
-                }
-
-                if (step == 0)
-                {
-                    //Use empty spot
-                    Console.WriteLine("USE " + game.ChoppedStrawberry.Position.ToString() + ";DROP Strawberry)");
-                }
-
-                   //**************************
-
-                if (step == 1)
-                {
-                    //Go to Dishwasher
-                    Console.WriteLine("MOVE " + game.Dishwasher.Position.X + " " + game.Dishwasher.Position.Y + ";GOTO dishwasher");
-                }
-                if (step == 2)
-                {
-                    //USE th Dishwasher
-                    Console.WriteLine("USE " + game.Dishwasher.Position.X + " " + game.Dishwasher.Position.Y + ";GET PLATE");
-                }
-                if (step == 3)
-                {
-                    //Go to Blueberry
-                    Console.WriteLine("MOVE " + game.Blueberry.Position.X + " " + game.Blueberry.Position.Y + ";GOTO blueberries");
-                }
-                if (step == 4)
-                {
-                    Console.WriteLine("USE " + game.Blueberry.Position.X + " " + game.Blueberry.Position.Y + ";PICK UP blueberries");
-                }
-                if (step == 5)
-                {
-                    //Move to icecream
-                    Console.WriteLine("MOVE " + game.IceCream.Position.X + " " + game.IceCream.Position.Y + "; GOTO Icecream");
-                }
-                if (step == 6)
-                {
-                    //Use to icecream
-                    Console.WriteLine("USE " + game.IceCream.Position.X + " " + game.IceCream.Position.Y + "; PICK UP Icecream");
-                }
-
-                if (step == 7)
-                {
-                    //Move to chipped strawberry
-                    Console.WriteLine("MOVE " + game.ChoppedStrawberry.Position.ToString() + ";GOTO Chopped Strawberry");
-                }
-                if (step == 8)
-                {
-                    //Use chopped strawberry
-                    Console.WriteLine("USE " + game.ChoppedStrawberry.Position.ToString() + ";Pick Up Chopped Strawberry");
-                    game.ChoppedStrawberry = null;
-                }
-
-                if (step == 9)
-                {
-                    //Move to Cooked
-                    Console.WriteLine("MOVE " + game.CookedDough.Position.ToString() + ";GOTO Cooked Dough");
-                }
-                if (step == 10)
-                {
-                    //Use chopped strawberry
-                    Console.WriteLine("USE " + game.CookedDough.Position.ToString() + ";PICK UP Cooked Dough");
-                    game.CookedDough = null;
-                }
-
-                if (step == 11)
-                {
-                    //Move to Window
-                    Console.WriteLine("MOVE " + game.Window.Position.X + " " + game.Window.Position.Y + "; GOTO Window");
-                }
-                if (step == 12)
-                {
-                    //Use to Window
-                    Console.WriteLine("USE " + game.Window.Position.X + " " + game.Window.Position.Y + "; SET PLATE DOWN");
-                }
-
+                StartLogic(game);
 
             }
         }
+
+        public static void StartLogic(Game game)
+        {
+            if (! game.MyChef.Item?.IsPlate ?? false)
+            {
+                GetPlate(game); 
+            }
+            else if(! game.MyChef.Item.HasCroissant())
+            {
+                GetCroissant(game);
+            }
+            else
+            {
+                SetItemDown(game);
+            }
+        }
+
+        public static bool SetItemDown(Game game)
+        {
+            //Find the closest spot
+            Table target = null;
+            double closestEmpty = double.MaxValue;
+            foreach (var table in game.Tables)
+            {
+                if (table.IsEmpty() && table.Position.Manhattan(game.MyChef.Position) < closestEmpty)
+                {
+                    target = table;
+                    closestEmpty = table.Position.Manhattan(game.MyChef.Position);
+                }
+            }
+            
+            //Go to the target
+            var atTarget = game.MyChef.CanReach(target);
+
+            if (!atTarget)
+            {
+                MoveTo(target.Position, "Move to Empty Spot");
+            }
+
+            //We're there and its available
+            if (atTarget)
+            {
+                Use(target.Position, "Set item Down");
+            }
+
+            return false;
+        }
+
+        public static bool GetCroissant(Game game)
+        {
+            //Look for existing Croissant
+            Table target = null;
+            foreach (var table in game.Tables)
+            {
+                if (table.Item != null && table.Item.HasCroissant() && !table.Item.IsPlate)//cant get croissant off a plate
+                {
+                    Console.Error.WriteLine("Croissant Found: " + table.Item.Content);
+                    target = table;
+                    break;
+                }
+            }
+
+            if(target == null)
+            {
+                CookCroissant(game);
+            }
+
+            if(target != null)
+            {
+                //Go to the target
+                var atTarget = game.MyChef.CanReach(target);
+                var isAvailable = (target.Item != null && target.Item.HasCroissant() && !target.Item.IsPlate);
+
+                if (!atTarget && isAvailable)
+                {
+                    MoveTo(target.Position, "Move to Croissant");
+                }
+
+                //We're there and its available
+                if (atTarget && isAvailable)
+                {
+                    Use(target.Position, "Pick Up Croissant");
+                }
+            }
+
+            return false;
+        }
+
+        public static bool CookCroissant(Game g)
+        {
+            Wait("Cook Croissant not implemented");
+            return false;
+        }
+
+        public static bool GetPlate(Game game)
+        {
+            //Get a plate, start by looking for an existing plate (not at dishwasher)
+            Table target = null;
+            //foreach (var table in game.Tables)
+            //{
+            //    if (table.Item?.IsPlate ?? false)
+            //    {
+            //        target = table;
+            //        break;
+            //    }
+            //}
+
+            //We couldnt find a plate so go to the dishwasher
+            if (target == null)
+            {
+                target = game.Dishwasher;
+            }
+            
+            //Go to the target
+            var atTarget = game.MyChef.CanReach(target);
+            var isAvailable = (target == game.Dishwasher || target.Item.IsPlate);
+
+            if(!atTarget && isAvailable)
+            {
+                MoveTo(target.Position, "Move to Plate");
+            }
+
+            //We're there and its available
+            if(atTarget && isAvailable)
+            {
+                Use(target.Position, "Pick Up Plate");
+            }
+
+            return game.MyChef.Item?.IsPlate ?? false;
+        }
+
+        public static void MoveTo(Position position,string message = "")
+        {
+            Console.WriteLine("MOVE " + position.ToString() + ";" + message);
+        }
+
+        public static void Use(Position position, string message = "")
+        {
+            Console.WriteLine("USE " + position.ToString() + ";" + message);
+        }
+
+        public static void Wait(string message = "")
+        {
+            Console.WriteLine("WAIT ;" + message);
+        }
+
 
         public static bool PositionsWithinReach(Position first, Position second)
         {
