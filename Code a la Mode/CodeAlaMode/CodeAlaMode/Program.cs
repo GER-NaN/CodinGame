@@ -9,7 +9,14 @@ using System.Collections.Generic;
 //https://www.codingame.com/contests/code-a-la-mode
 namespace CodeAlaMode
 {
-    public class Game
+
+    public enum State
+    {
+        Idle,
+        CookingDough
+    }
+
+     public class Game
     {
         public Player[] Players = new Player[2];
         public Table Dishwasher;
@@ -19,16 +26,17 @@ namespace CodeAlaMode
         public Table Strawberry;
         public Table Chopping;
         public Table Dough;
-        public Table Oven;
+   
 
         //When I set it down, maybe dont need this
         public Table ChoppedStrawberry;
         public Table CookedDough;
-        public int CookTime;
         
         public List<Table> Tables = new List<Table>();
 
         public Player MyChef;
+        public State State = State.Idle;
+        public Oven Oven;//TODO:Refactor implemention to use this
     }
 
     public class Table
@@ -53,9 +61,10 @@ namespace CodeAlaMode
             IsPlate = Content.Contains(MainClass.Dish);
         }
 
-        public bool HasDough()
+        /// <summary>Dough is always stand-alone and cannot go on a plate</summary>
+        public bool IsDough()
         {
-            return Content.Contains(MainClass.Dough);
+            return Content == MainClass.Dough;
         }
 
         public bool HasCroissant()
@@ -63,6 +72,29 @@ namespace CodeAlaMode
             return Content.Contains(MainClass.Croissant);
         }
     }
+
+    public class Oven
+    {
+        public readonly Position Position;
+
+        public int Timer;
+        public Item Contents;
+        public Table Table;
+
+        public Oven(Position position)
+        {
+            Position = position;
+        }
+
+        public bool IsEmpty
+        {
+            get
+            {
+                return Contents != null && !String.IsNullOrWhiteSpace(Contents.Content);
+            }
+        }
+    }
+
 
     public class Player
     {
@@ -79,11 +111,30 @@ namespace CodeAlaMode
             Item = item;
         }
 
-        public bool CanReach(Table t)
+        public bool CanReach(Table table)
         {
-            //Pythagorean theorm
-            var distance = Math.Sqrt(Math.Pow(Position.X - t.Position.X, 2) + Math.Pow(Position.Y - t.Position.Y, 2));
-            return (distance <= 1.5);
+            return CanReach(table.Position);
+        }
+
+        public bool CanReach(Position position)
+        {
+            var distance = Math.Sqrt(Math.Pow(Position.X - position.X, 2) + Math.Pow(Position.Y - position.Y, 2));
+            return (distance <= 1.5);//Pythagorean theorm, would manhatten work?
+        }
+
+        public bool IsEmpty()
+        {
+            return (Item == null || Item.Content == "NONE");
+        }
+
+        public bool HasDough()
+        {
+            return (Item != null && Item.IsDough());
+        }
+
+        internal bool HasCroissant()
+        {
+            return (Item != null && Item.Content == MainClass.Croissant);
         }
     }
 
@@ -108,7 +159,7 @@ namespace CodeAlaMode
 
     public class MainClass
     {
-        public static bool Debug = true;
+        public static bool Debug = true;//prints the input
         public const string Dish = "DISH";
         public const string Dough = "DOUGH";
         public const string Croissant = "CROISSANT";
@@ -135,7 +186,7 @@ namespace CodeAlaMode
                     if (kitchenLine[x] == 'S') game.Strawberry = new Table { Position = new Position(x, i), HasFunction = true };
                     if (kitchenLine[x] == 'C') game.Chopping = new Table { Position = new Position(x, i), HasFunction = true };
                     if (kitchenLine[x] == 'H') game.Dough = new Table { Position = new Position(x, i), HasFunction = true };
-                    if (kitchenLine[x] == 'O') game.Oven = new Table { Position = new Position(x, i), HasFunction = true };
+                    if (kitchenLine[x] == 'O') game.Oven = new Oven (new Position(x, i));
                     if (kitchenLine[x] == '#') game.Tables.Add(new Table { Position = new Position(x, i) });
                 }
             }
@@ -179,7 +230,6 @@ namespace CodeAlaMode
 
             // KITCHEN INPUT
             var game = ReadGame();
-            var step = -11;
             while (true)
             {
                 int turnsRemaining = int.Parse(ReadLine());
@@ -195,7 +245,9 @@ namespace CodeAlaMode
                 {
                     t.Item = null;
                 }
-                int numTablesWithItems = int.Parse(ReadLine()); // the number of tables in the kitchen that currently hold an item
+
+                //Table items
+                int numTablesWithItems = int.Parse(ReadLine()); 
                 for (int i = 0; i < numTablesWithItems; i++)
                 {
                     inputs = ReadLine().Split(' ');
@@ -203,10 +255,13 @@ namespace CodeAlaMode
                     table.Item = new Item(inputs[2]);
                 }
 
+                //Oven stuff
                 inputs = ReadLine().Split(' ');
-                string ovenContents = inputs[0]; // ignore until bronze league
-                int ovenTimer = int.Parse(inputs[1]);
-                int numCustomers = int.Parse(ReadLine()); // the number of customers currently waiting for food
+                game.Oven.Contents = new Item(inputs[0]);
+                game.Oven.Timer = int.Parse(inputs[1]);
+
+                //Customer stuff, the number of customers currently waiting for food
+                int numCustomers = int.Parse(ReadLine());
                 for (int i = 0; i < numCustomers; i++)
                 {
                     inputs = ReadLine().Split(' ');
@@ -218,24 +273,33 @@ namespace CodeAlaMode
                 game.MyChef = game.Players[0];
 
                 StartLogic(game);
-
             }
         }
 
         public static void StartLogic(Game game)
         {
-            if (! game.MyChef.Item?.IsPlate ?? false)
-            {
-                GetPlate(game); 
-            }
-            else if(! game.MyChef.Item.HasCroissant())
-            {
-                GetCroissant(game);
-            }
-            else
+            if(game.MyChef.HasCroissant())
             {
                 SetItemDown(game);
             }
+            else
+            {
+                CookCroissant(game);
+            }
+
+
+            //if (game.MyChef.Item == null || !game.MyChef.Item.IsPlate)
+            //{
+            //    GetPlate(game);
+            //}
+            //else if(! game.MyChef.Item.HasCroissant())
+            //{
+            //    GetCroissant(game);
+            //}
+            //else
+            //{
+            //    SetItemDown(game);
+            //}
         }
 
         public static bool SetItemDown(Game game)
@@ -263,7 +327,7 @@ namespace CodeAlaMode
             //We're there and its available
             if (atTarget)
             {
-                Use(target.Position, "Set item Down");
+                Use(target.Position, "Set item Down: " + game.MyChef.Item.Content );
             }
 
             return false;
@@ -283,11 +347,6 @@ namespace CodeAlaMode
                 }
             }
 
-            if(target == null)
-            {
-                CookCroissant(game);
-            }
-
             if(target != null)
             {
                 //Go to the target
@@ -305,13 +364,108 @@ namespace CodeAlaMode
                     Use(target.Position, "Pick Up Croissant");
                 }
             }
+            else
+            {
+                FindDough(game);
+            }
 
             return false;
         }
 
-        public static bool CookCroissant(Game g)
+        public static bool CookCroissant(Game game)
         {
-            Wait("Cook Croissant not implemented");
+            if(game.State == State.CookingDough)
+            {
+                //Wait for oven to cook
+                if(game.Oven.Timer == 10)
+                {
+                    Use(game.Oven.Position, "Get Croissant from Oven");
+                    Console.Error.WriteLine(game.Oven.Timer + " " + game.Oven.Contents.Content);
+                    game.State = State.Idle;//were done
+                }
+                else
+                {
+                    Wait("Dough is Cooking.");
+                }
+            }
+            else if(game.MyChef.HasDough())
+            {
+                var target = game.Oven.Position;
+                var atTarget = game.MyChef.CanReach(target);
+                var isAvailable = game.Oven.IsEmpty;
+
+                if (!atTarget)
+                {
+                    MoveTo(target, "Move to Oven");
+                }
+
+                //We're there and its available
+                if (atTarget && isAvailable)
+                {
+                    Use(target, "Put Dough in Oven");
+                    game.State = State.CookingDough;
+                }
+
+                if(atTarget && !isAvailable)
+                {
+                    Wait("Waiting for Oven");
+                }
+            }
+            else
+            {
+                FindDough(game);
+            }
+
+            return game.MyChef.HasCroissant();
+        }
+
+        public static bool FindDough(Game game)
+        {
+            if(game.MyChef.HasDough())
+            {
+                Wait("We have dough");
+                return true;
+            }
+
+            //Move to dough
+            Table target = null;
+            foreach (var table in game.Tables)
+            {
+                if (table.Item?.IsDough() ?? false)
+                {
+                    target = table;
+                    break;
+                }
+            }
+
+            if(target == null)
+            {
+                target = game.Dough;
+            }
+
+
+            //Go to the target
+            var atTarget = game.MyChef.CanReach(target);
+            var isAvailable = (target == game.Dough || target.Item.IsDough());
+
+            if (!atTarget && isAvailable)
+            {
+                MoveTo(target.Position, "Move to Dough");
+            }
+
+            //We're there and its available
+            if (atTarget && isAvailable)
+            {
+                if(!game.MyChef.IsEmpty())
+                {
+                    SetItemDown(game);
+                }
+                else
+                {
+                    Use(target.Position, "Pick Up Dough");
+                }
+            }
+
             return false;
         }
 
