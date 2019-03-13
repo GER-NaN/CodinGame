@@ -16,7 +16,7 @@ namespace CodeAlaMode
         CookingDough
     }
 
-     public class Game
+    public class Game
     {
         public Player[] Players = new Player[2];
         public Table Dishwasher;
@@ -136,6 +136,11 @@ namespace CodeAlaMode
         {
             return (Item != null && Item.Content == MainClass.Croissant);
         }
+
+        internal bool HasChoppedDough()
+        {
+            return (Item != null && Item.Content == MainClass.ChoppedDough);
+        }
     }
 
     public class Position
@@ -159,6 +164,8 @@ namespace CodeAlaMode
 
     public class MainClass
     {
+        public static int SwitchFlag = 1;
+
         public static bool Debug = true;//prints the input
         public const string Dish = "DISH";
         public const string Dough = "DOUGH";
@@ -166,6 +173,7 @@ namespace CodeAlaMode
         public const string Blueberries = "BLUEBERRIES";
         public const string IceCream = "ICE_CREAM";
         public const string ChoppedStrawberries = "CHOPPED_STRAWBERRIES";
+        public const string ChoppedDough = "CHOPPED_DOUGH";
 
 
         public static Game ReadGame()
@@ -276,30 +284,26 @@ namespace CodeAlaMode
             }
         }
 
+ 
         public static void StartLogic(Game game)
         {
-            if(game.MyChef.HasCroissant())
+            if(game.MyChef.HasChoppedDough() || game.MyChef.HasCroissant())
             {
                 SetItemDown(game);
+                SwitchFlag++;
             }
             else
             {
-                CookCroissant(game);
+                if (SwitchFlag % 2 == 0)
+                {
+                    CookCroissant(game);
+                }
+                else
+                {
+                    ChopDough(game);
+                }
             }
 
-
-            //if (game.MyChef.Item == null || !game.MyChef.Item.IsPlate)
-            //{
-            //    GetPlate(game);
-            //}
-            //else if(! game.MyChef.Item.HasCroissant())
-            //{
-            //    GetCroissant(game);
-            //}
-            //else
-            //{
-            //    SetItemDown(game);
-            //}
         }
 
         public static bool SetItemDown(Game game)
@@ -331,6 +335,32 @@ namespace CodeAlaMode
             }
 
             return false;
+        }
+
+        public static bool ChopDough(Game game)
+        {
+            if (game.MyChef.HasDough())
+            {
+                var target = game.Chopping.Position;
+                var atTarget = game.MyChef.CanReach(target);
+
+                if (!atTarget)
+                {
+                    MoveTo(target, "Move to Copping Board");
+                }
+
+                //We're there and its available
+                if (atTarget)
+                {
+                    Use(target, "Chop Dough");
+                }
+            }
+            else
+            {
+                FindDough(game);
+            }
+
+            return game.MyChef.HasChoppedDough();
         }
 
         public static bool GetCroissant(Game game)
@@ -366,7 +396,7 @@ namespace CodeAlaMode
             }
             else
             {
-                FindDough(game);
+                CookCroissant(game);
             }
 
             return false;
