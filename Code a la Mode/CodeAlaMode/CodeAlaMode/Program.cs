@@ -71,6 +71,11 @@ namespace CodeAlaMode
         {
             return Content.Contains(MainClass.Croissant);
         }
+
+        internal bool IsStrawberry()
+        {
+            return Content == MainClass.Strawberries;
+        }
     }
 
     public class Oven
@@ -141,6 +146,16 @@ namespace CodeAlaMode
         {
             return (Item != null && Item.Content == MainClass.ChoppedDough);
         }
+
+        internal bool HasStrawberry()
+        {
+            return (Item != null && Item.Content == MainClass.Strawberries);
+        }
+
+        internal bool HasChoppedStrawberries()
+        {
+            return (Item != null && Item.Content == MainClass.ChoppedStrawberries);
+        }
     }
 
     public class Position
@@ -172,6 +187,7 @@ namespace CodeAlaMode
         public const string Croissant = "CROISSANT";
         public const string Blueberries = "BLUEBERRIES";
         public const string IceCream = "ICE_CREAM";
+        public const string Strawberries = "STRAWBERRIES";
         public const string ChoppedStrawberries = "CHOPPED_STRAWBERRIES";
         public const string ChoppedDough = "CHOPPED_DOUGH";
 
@@ -287,20 +303,25 @@ namespace CodeAlaMode
  
         public static void StartLogic(Game game)
         {
-            if(game.MyChef.HasChoppedDough() || game.MyChef.HasCroissant())
+            if(game.MyChef.HasChoppedDough() || game.MyChef.HasCroissant() || game.MyChef.HasChoppedStrawberries())
             {
                 SetItemDown(game);
                 SwitchFlag++;
+                Console.Error.WriteLine("Switch: " + SwitchFlag);
             }
             else
             {
-                if (SwitchFlag % 2 == 0)
+                if (SwitchFlag % 3 == 0)
                 {
                     CookCroissant(game);
                 }
-                else
+                else if(SwitchFlag % 3 == 1)
                 {
                     ChopDough(game);
+                }
+                else if(SwitchFlag % 3 == 2)
+                {
+                    ChopBerries(game);
                 }
             }
 
@@ -362,6 +383,33 @@ namespace CodeAlaMode
 
             return game.MyChef.HasChoppedDough();
         }
+
+        public static bool ChopBerries(Game game)
+        {
+            if (game.MyChef.HasStrawberry())
+            {
+                var target = game.Chopping.Position;
+                var atTarget = game.MyChef.CanReach(target);
+
+                if (!atTarget)
+                {
+                    MoveTo(target, "Move to Copping Board");
+                }
+
+                //We're there and its available
+                if (atTarget)
+                {
+                    Use(target, "Chop Strawberries");
+                }
+            }
+            else
+            {
+                FindStrawberry(game);
+            }
+
+            return game.MyChef.HasChoppedStrawberries();
+        }
+
 
         public static bool GetCroissant(Game game)
         {
@@ -498,6 +546,58 @@ namespace CodeAlaMode
 
             return false;
         }
+
+        public static bool FindStrawberry(Game game)
+        {
+            if (game.MyChef.HasStrawberry())
+            {
+                Wait("We have Strawberry");
+                return true;
+            }
+
+            //Move to strawberry
+            Table target = null;
+            foreach (var table in game.Tables)
+            {
+                if (table.Item?.IsStrawberry() ?? false)
+                {
+                    target = table;
+                    break;
+                }
+            }
+
+            if (target == null)
+            {
+                target = game.Strawberry;//Go to the crate
+            }
+
+
+            //Go to the target
+            var atTarget = game.MyChef.CanReach(target);
+            var isAvailable = (target == game.Strawberry || target.Item.IsStrawberry());
+
+            if (!atTarget && isAvailable)
+            {
+                MoveTo(target.Position, "Move to Strawberry");
+            }
+
+            //We're there and its available
+            if (atTarget && isAvailable)
+            {
+                if (!game.MyChef.IsEmpty())
+                {
+                    SetItemDown(game);
+                }
+                else
+                {
+                    Use(target.Position, "Pick Up Strawberry");
+                }
+            }
+
+            return false;
+        }
+
+
 
         public static bool GetPlate(Game game)
         {
