@@ -90,7 +90,7 @@ namespace CodeAlaMode
         {
             get
             {
-                return Contents != null && !String.IsNullOrWhiteSpace(Contents.Content);
+                return Contents.Content == "NONE";
             }
         }
     }
