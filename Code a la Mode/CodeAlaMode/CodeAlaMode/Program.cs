@@ -36,7 +36,9 @@ namespace CodeAlaMode
 
         public Player MyChef;
         public State State = State.Idle;
-        public Oven Oven;//TODO:Refactor implemention to use this
+        public Oven Oven;
+
+        public List<CustomerOrder> CustomerOrders = new List<CustomerOrder>();
     }
 
     public class Table
@@ -50,6 +52,58 @@ namespace CodeAlaMode
             return Item == null;
         }
     }
+
+    public class CustomerOrder
+    {
+        public string Content;
+        public List<Item> Items = new List<Item>();
+        public int Score;
+
+        public CustomerOrder(string content, int score)
+        {
+            Content = content;
+            Score = score;
+
+            //Parse content
+            if(Content.Contains("ICE_CREAM"))
+            {
+                Items.Add(new Item("ICE_CREAM"));
+            }
+            if (Content.Contains("BLUEBERRIES"))
+            {
+                Items.Add(new Item("BLUEBERRIES"));
+            }
+            if (Content.Contains("CHOPPED_STRAWBERRIES"))
+            {
+                Items.Add(new Item("CHOPPED_STRAWBERRIES"));
+            }
+            if (Content.Contains("CROISSANT"))
+            {
+                Items.Add(new Item("CROISSANT"));
+            }
+            if (Content.Contains("TART"))
+            {
+                Items.Add(new Item("TART"));
+            }
+        }
+
+        public bool HasIceCream()
+        {
+            return Items.Any(item => item.IsIceCream());
+        }
+
+        public bool HasBlueberry()
+        {
+            return Items.Any(item => item.IsBlueberry());
+        }
+
+        public bool IsIceCreamBerry()
+        {
+            Console.Error.WriteLine("HasIceCream: " + HasIceCream() + "Has BlueBerry: " + HasBlueberry() + "ItemCount: " + Items.Count() + " - " + Content);
+            return HasIceCream() && HasBlueberry() && Items.Count == 2;
+        }
+    }
+
 
     public class Item
     {
@@ -75,6 +129,27 @@ namespace CodeAlaMode
         internal bool IsStrawberry()
         {
             return Content == MainClass.Strawberries;
+        }
+
+        public bool IsIceCream()
+        {
+            return Content == MainClass.IceCream;
+        }
+
+        public bool IsBlueberry()
+        {
+            return Content == MainClass.Blueberries;
+        }
+
+
+        internal bool HasIcecream()
+        {
+            return Content.Contains(MainClass.IceCream);
+        }
+
+        internal bool HasBlueberry()
+        {
+            return Content.Contains(MainClass.Blueberries);
         }
     }
 
@@ -155,6 +230,21 @@ namespace CodeAlaMode
         internal bool HasChoppedStrawberries()
         {
             return (Item != null && Item.Content == MainClass.ChoppedStrawberries);
+        }
+
+        internal bool HasPlate()
+        {
+            return (Item != null && Item.IsPlate);
+        }
+
+        internal bool HasBlueberryOnPlate()
+        {
+            return (Item != null && Item.IsPlate && Item.HasBlueberry());
+        }
+
+        internal bool HasIceCreanOnPlate()
+        {
+            return (Item != null && Item.IsPlate && Item.HasIcecream());
         }
     }
 
@@ -269,6 +359,8 @@ namespace CodeAlaMode
                 {
                     t.Item = null;
                 }
+                //Cean customer orders
+                game.CustomerOrders.Clear();
 
                 //Table items
                 int numTablesWithItems = int.Parse(ReadLine()); 
@@ -291,6 +383,8 @@ namespace CodeAlaMode
                     inputs = ReadLine().Split(' ');
                     string customerItem = inputs[0];
                     int customerAward = int.Parse(inputs[1]);
+
+                    game.CustomerOrders.Add(new CustomerOrder(customerItem, customerAward));
                 }
 
                 // GAME LOGIC
@@ -300,31 +394,163 @@ namespace CodeAlaMode
             }
         }
 
- 
-        public static void StartLogic(Game game)
+        public static bool PutIceCreamOnPlate(Game game)
         {
-            if(game.MyChef.HasChoppedDough() || game.MyChef.HasCroissant() || game.MyChef.HasChoppedStrawberries())
+            if (game.MyChef.HasIceCreanOnPlate())
             {
-                SetItemDown(game);
-                SwitchFlag++;
-                Console.Error.WriteLine("Switch: " + SwitchFlag);
+                Wait("We have IceCream");
+                return true;
             }
-            else
+
+            //Move to Blueberry
+            Table target = null;
+            foreach (var table in game.Tables)
             {
-                if (SwitchFlag % 3 == 0)
+                if (table.Item?.IsIceCream() ?? false)
                 {
-                    CookCroissant(game);
-                }
-                else if(SwitchFlag % 3 == 1)
-                {
-                    ChopDough(game);
-                }
-                else if(SwitchFlag % 3 == 2)
-                {
-                    ChopBerries(game);
+                    target = table;
+                    break;
                 }
             }
 
+            if (target == null)
+            {
+                target = game.IceCream;//Go to the crate
+            }
+
+
+            //Go to the target
+            var atTarget = game.MyChef.CanReach(target);
+            var isAvailable = (target == game.IceCream || target.Item.IsIceCream());
+
+            if (!atTarget && isAvailable)
+            {
+                MoveTo(target.Position, "Move to IceCream");
+            }
+
+            //We're there and its available
+            if (atTarget && isAvailable)
+            {
+                Use(target.Position, "Pick Up IceCream");
+            }
+
+            return false;
+        }
+
+        public static bool PutBlueberryOnPlate(Game game)
+        {
+            if (game.MyChef.HasBlueberryOnPlate())
+            {
+                Wait("We have Blueberry");
+                return true;
+            }
+
+            //Move to Blueberry
+            Table target = null;
+            foreach (var table in game.Tables)
+            {
+                if (table.Item?.IsBlueberry() ?? false)
+                {
+                    target = table;
+                    break;
+                }
+            }
+
+            if (target == null)
+            {
+                target = game.Blueberry;//Go to the crate
+            }
+
+
+            //Go to the target
+            var atTarget = game.MyChef.CanReach(target);
+            var isAvailable = (target == game.Blueberry || target.Item.IsBlueberry());
+
+            if (!atTarget && isAvailable)
+            {
+                MoveTo(target.Position, "Move to Blueberry");
+            }
+
+            //We're there and its available
+            if (atTarget && isAvailable)
+            {
+                Use(target.Position, "Pick Up Blueberry");  
+            }
+
+            return false;
+        }
+ 
+        public static bool ServeDish(Game game)
+        {
+            var target = game.Window.Position;
+            var atTarget = game.MyChef.CanReach(target);
+
+            if (!atTarget)
+            {
+                MoveTo(target, "Move to Window");
+            }
+
+            //We're there and its available
+            if (atTarget)
+            {
+                Use(target, "Serve Dish");
+            }
+
+            return false;
+        }
+
+        public static void StartLogic(Game game)
+        {
+            if(game.CustomerOrders.Any(order => order.IsIceCreamBerry()))
+            {
+                //make the simple order
+                if(game.MyChef.HasPlate())
+                {
+                    if(!game.MyChef.Item.HasIcecream())
+                    {
+                        PutIceCreamOnPlate(game);
+                    }
+                    else if(!game.MyChef.Item.HasBlueberry())
+                    {
+                        PutBlueberryOnPlate(game);
+                    }
+                    else
+                    {
+                        ServeDish(game);
+                    }
+                }
+                else
+                {
+                    GetPlate(game);
+                }
+
+            }
+            else
+            {
+                //Prepare stuff
+                if (game.MyChef.HasChoppedDough() || game.MyChef.HasCroissant() || game.MyChef.HasChoppedStrawberries())
+                {
+                    SetItemDown(game);
+                    SwitchFlag++;
+                    Console.Error.WriteLine("Switch: " + SwitchFlag);
+                }
+                else
+                {
+                    if (SwitchFlag % 3 == 0)
+                    {
+                        CookCroissant(game);
+                    }
+                    else if (SwitchFlag % 3 == 1)
+                    {
+                        ChopDough(game);
+                    }
+                    else if (SwitchFlag % 3 == 2)
+                    {
+                        ChopBerries(game);
+                    }
+                }
+            }
+            
         }
 
         public static bool SetItemDown(Game game)
