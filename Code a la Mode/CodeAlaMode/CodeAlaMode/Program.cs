@@ -97,11 +97,21 @@ namespace CodeAlaMode
             return Items.Any(item => item.IsBlueberry());
         }
 
+        public bool HasChoppedBerry()
+        {
+            return Items.Any(item => item.IsChoppedStrawberry());
+        }
+
         public bool IsIceCreamBerry()
         {
-            Console.Error.WriteLine("HasIceCream: " + HasIceCream() + "Has BlueBerry: " + HasBlueberry() + "ItemCount: " + Items.Count() + " - " + Content);
             return HasIceCream() && HasBlueberry() && Items.Count == 2;
         }
+
+        public bool IsIceCreamStrawBerry()
+        {
+            return HasIceCream() && HasChoppedBerry() && Items.Count == 2;
+        }
+
     }
 
 
@@ -141,6 +151,11 @@ namespace CodeAlaMode
             return Content == MainClass.Blueberries;
         }
 
+        internal bool IsChoppedStrawberry()
+        {
+            return Content == MainClass.ChoppedStrawberries;
+        }
+
 
         internal bool HasIcecream()
         {
@@ -150,6 +165,11 @@ namespace CodeAlaMode
         internal bool HasBlueberry()
         {
             return Content.Contains(MainClass.Blueberries);
+        }
+
+        internal bool HasChoppedStrawberry()
+        {
+            return Content.Contains(MainClass.ChoppedStrawberries);
         }
     }
 
@@ -246,6 +266,14 @@ namespace CodeAlaMode
         {
             return (Item != null && Item.IsPlate && Item.HasIcecream());
         }
+
+        internal bool HasChoppedStrawberryOnPlate()
+        {
+            return (Item != null && Item.IsPlate && Item.HasChoppedStrawberry());
+        }
+
+        
+        //Need to make clearer logic to look at whats in hand vs whats on the plate.
     }
 
     public class Position
@@ -524,6 +552,31 @@ namespace CodeAlaMode
                     GetPlate(game);
                 }
 
+            }
+            else if(game.CustomerOrders.Any(order => order.IsIceCreamStrawBerry()))
+            {
+                if(game.MyChef.Item.HasChoppedStrawberry())
+                {
+                    if(game.MyChef.HasPlate() )
+                    {
+                        if(game.MyChef.Item.HasIcecream())
+                        {
+                            ServeDish(game);
+                        }
+                        else
+                        {
+                            PutIceCreamOnPlate(game);
+                        }
+                    }
+                    else
+                    {
+                        GetPlate(game);
+                    }
+                }
+                else
+                {
+                    ChopBerries(game);
+                }
             }
             else
             {
