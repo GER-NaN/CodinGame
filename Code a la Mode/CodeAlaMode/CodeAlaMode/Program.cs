@@ -16,6 +16,16 @@ namespace CodeAlaMode
         CookingDough
     }
 
+    public enum Ingredient
+    {
+        Croissant,
+        ChoppedStrawberry,
+        Blueberry,
+        IceCream,
+        Tart
+    }
+
+
     public class Game
     {
         public Player[] Players = new Player[2];
@@ -147,6 +157,10 @@ namespace CodeAlaMode
             return HasBlueberry() && HasCroissant() && HasIceCream() && Items.Count == 3;
         }
 
+        public bool IsCroissantDoubleBerry()
+        {
+            return HasBlueberry() && HasCroissant() && HasChoppedBerry() && Items.Count == 3;
+        }
     }
 
 
@@ -158,6 +172,56 @@ namespace CodeAlaMode
         {
             Content = content;
             IsPlate = Content.Contains(MainClass.Dish);
+        }
+
+        public bool ContainsIngredient(Ingredient ingredient)
+        {
+            bool contains = false;
+            switch (ingredient)
+            {
+                case Ingredient.Croissant:
+                    contains =  Content.Contains(MainClass.Croissant);
+                    break;
+                case Ingredient.Blueberry:
+                    contains = Content.Contains(MainClass.Blueberries);
+                    break;
+                case Ingredient.ChoppedStrawberry:
+                    contains = Content.Contains(MainClass.ChoppedStrawberries);
+                    break;
+                case Ingredient.IceCream:
+                    contains = Content.Contains(MainClass.IceCream);
+                    break;
+                case Ingredient.Tart:
+                    contains = Content.Contains(MainClass.Tart);
+                    break;
+            }
+
+            return contains;
+        }
+
+        public bool IsIngredient(Ingredient ingredient)
+        {
+            bool contains = false;
+            switch (ingredient)
+            {
+                case Ingredient.Croissant:
+                    contains = Content == MainClass.Croissant;
+                    break;
+                case Ingredient.Blueberry:
+                    contains = Content == MainClass.Blueberries;
+                    break;
+                case Ingredient.ChoppedStrawberry:
+                    contains = Content == MainClass.ChoppedStrawberries;
+                    break;
+                case Ingredient.IceCream:
+                    contains = Content == MainClass.IceCream;
+                    break;
+                case Ingredient.Tart:
+                    contains = Content == MainClass.Tart;
+                    break;
+            }
+
+            return contains;
         }
 
         /// <summary>Dough is always stand-alone and cannot go on a plate</summary>
@@ -225,6 +289,18 @@ namespace CodeAlaMode
         internal bool IsCroissantStrawberry()
         {
             return Content == "DISH-CROISSANT-CHOPPED_STRAWBERRIES" || Content == "DISH-CHOPPED_STRAWBERRIES-CROISSANT";
+        }
+
+        internal bool IsCroissantDoubleBerry()
+        {
+            return
+                Content == "DISH-CHOPPED_STRAWBERRIES-BLUEBERRIES-CROISSANT" ||
+                Content == "DISH-CHOPPED_STRAWBERRIES-CROISSANT-BLUEBERRIES" ||
+                Content == "DISH-BLUEBERRIES-CROISSANT-CHOPPED_STRAWBERRIES" ||
+                Content == "DISH-BLUEBERRIES-CHOPPED_STRAWBERRIES-CROISSANT" ||
+                Content == "DISH-CROISSANT-CHOPPED_STRAWBERRIES-BLUEBERRIES" ||
+                Content == "DISH-CROISSANT-BLUEBERRIES-CHOPPED_STRAWBERRIES";
+
         }
     }
 
@@ -332,7 +408,34 @@ namespace CodeAlaMode
             return (Item != null && Item.IsPlate && Item.HasChoppedStrawberry());
         }
 
+        /// <summary>Checks if the chef has a plate and the specified ingredient </summary>
+        /// <param name="ingredient">The ingredient that should be on the plates</param>
+        /// <returns>True if the chef has a plate and the ingredient.</returns>
+        public bool IsItemOnPlate(Ingredient ingredient)
+        {
+            bool itemFound = false;
+
+            if(Item.IsPlate)
+            {
+                itemFound = Item.ContainsIngredient(ingredient);
+            }
+            return itemFound;
+        }
+
+        public bool HasSingleIngredient(Ingredient ingredient)
+        {
+            bool itemFound = false;
+
+            if (!Item.IsPlate)
+            {
+                itemFound = Item.IsIngredient(ingredient);
+            }
+            return itemFound;
+        }
         
+
+
+
         //Need to make clearer logic to look at whats in hand vs whats on the plate.
     }
 
@@ -368,6 +471,7 @@ namespace CodeAlaMode
         public const string Strawberries = "STRAWBERRIES";
         public const string ChoppedStrawberries = "CHOPPED_STRAWBERRIES";
         public const string ChoppedDough = "CHOPPED_DOUGH";
+        public const string Tart = "TART";
 
 
         public static Game ReadGame()
@@ -517,6 +621,10 @@ namespace CodeAlaMode
             {
                 MakeCroissantIceCreamBerry(game);
             }
+            else if (game.CustomerOrders.Any(order => order.IsCroissantDoubleBerry()))
+            {
+                MakeCroissantDoubleBerry(game);
+            }
 
             /************      4 Tier Items ****************/
 
@@ -524,6 +632,49 @@ namespace CodeAlaMode
             {
                 MakeSupportItems(game);
             }
+        }
+
+        public static bool MakeCroissantDoubleBerry(Game game)
+        {
+            if (game.MyChef.Item.IsCroissantDoubleBerry())
+            {
+                ServeDish(game);
+            }
+            else if (game.MyChef.HasSingleIngredient(Ingredient.Croissant) || game.MyChef.IsItemOnPlate(Ingredient.Croissant) || game.Tables.Any(t => (t.Item?.IsCroissant() ?? false) || (t.Item?.IsCroissantAndPlate() ?? false)))
+            {
+                if (game.MyChef.HasSingleIngredient(Ingredient.ChoppedStrawberry) || game.MyChef.IsItemOnPlate(Ingredient.ChoppedStrawberry) || game.Tables.Any(t => (t.Item?.IsChoppedStrawberry() ?? false) || (t.Item?.IsChoppedStrawberryAndPlate() ?? false)))
+                {
+                    //Both things are available somewhere. Get a plate and then build the dish
+                    if (game.MyChef.HasPlate())
+                    {
+                        if (!game.MyChef.IsItemOnPlate(Ingredient.Croissant))
+                        {
+                            GetCroissant(game);
+                        }
+                        else if (!game.MyChef.IsItemOnPlate(Ingredient.ChoppedStrawberry))
+                        {
+                            GetChoppedStrawberry(game);
+                        }
+                        else if(!game.MyChef.IsItemOnPlate(Ingredient.Blueberry))
+                        {
+                            PutBlueberryOnPlate(game);
+                        }
+                    }
+                    else
+                    {
+                        GetPlate(game);
+                    }
+                }
+                else
+                {
+                    ChopBerries(game);
+                }
+            }
+            else
+            {
+                GetCroissant(game);
+            }
+            return false;
         }
 
         public static bool MakeCroissantIceCreamBerry(Game game)
