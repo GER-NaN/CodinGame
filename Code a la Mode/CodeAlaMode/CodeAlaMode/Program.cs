@@ -22,7 +22,9 @@ namespace CodeAlaMode
         ChoppedStrawberry,
         Blueberry,
         IceCream,
-        Tart
+        Tart,
+        ChoppedDough,
+        RawTart
     }
 
 
@@ -161,6 +163,11 @@ namespace CodeAlaMode
         {
             return HasBlueberry() && HasCroissant() && HasChoppedBerry() && Items.Count == 3;
         }
+
+        public bool IsCroissantDoubleBerryIceCream()
+        {
+            return HasBlueberry() && HasCroissant() && HasChoppedBerry() && HasIceCream();
+        }
     }
 
 
@@ -194,6 +201,12 @@ namespace CodeAlaMode
                 case Ingredient.Tart:
                     contains = Content.Contains(MainClass.Tart);
                     break;
+                case Ingredient.ChoppedDough:
+                    contains = Content.Contains(MainClass.ChoppedDough);
+                    break;
+                case Ingredient.RawTart:
+                    contains = Content.Contains(MainClass.RawTart);
+                    break;
             }
 
             return contains;
@@ -218,6 +231,12 @@ namespace CodeAlaMode
                     break;
                 case Ingredient.Tart:
                     contains = Content == MainClass.Tart;
+                    break;
+                case Ingredient.ChoppedDough:
+                    contains = Content == MainClass.ChoppedDough;
+                    break;
+                case Ingredient.RawTart:
+                    contains = Content == MainClass.RawTart;
                     break;
             }
 
@@ -301,6 +320,16 @@ namespace CodeAlaMode
                 Content == "DISH-CROISSANT-CHOPPED_STRAWBERRIES-BLUEBERRIES" ||
                 Content == "DISH-CROISSANT-BLUEBERRIES-CHOPPED_STRAWBERRIES";
 
+        }
+
+
+        internal bool IsCroissantDoubleBerryIceCream()
+        {
+            return 
+                this.ContainsIngredient(Ingredient.Croissant) &&
+                this.ContainsIngredient(Ingredient.Blueberry) &&
+                this.ContainsIngredient(Ingredient.ChoppedStrawberry) &&
+                this.ContainsIngredient(Ingredient.IceCream);
         }
     }
 
@@ -472,6 +501,7 @@ namespace CodeAlaMode
         public const string ChoppedStrawberries = "CHOPPED_STRAWBERRIES";
         public const string ChoppedDough = "CHOPPED_DOUGH";
         public const string Tart = "TART";
+        public const string RawTart = "RAW_TART";
 
 
         public static Game ReadGame()
@@ -587,6 +617,7 @@ namespace CodeAlaMode
 
         public static void StartLogic(Game game)
         {
+ 
             if (game.CustomerOrders.Any(order => order.IsIceCreamBerry()))
             {
                 MakeIceCreamBerry(game);
@@ -627,11 +658,62 @@ namespace CodeAlaMode
             }
 
             /************      4 Tier Items ****************/
-
+            else if(game.CustomerOrders.Any(order => order.IsCroissantDoubleBerryIceCream()))
+            {
+                MakeCroissantDoubleBerryIceCream(game);
+            }
             else
             {
-                MakeSupportItems(game);
+                MakeTartSupport(game);
+                //MakeSupportItems(game);
             }
+        }
+
+        public static bool MakeCroissantDoubleBerryIceCream(Game game)
+        {
+            if (game.MyChef.Item.IsCroissantDoubleBerryIceCream())
+            {
+                ServeDish(game);
+            }
+            else if (game.MyChef.HasSingleIngredient(Ingredient.Croissant) || game.MyChef.IsItemOnPlate(Ingredient.Croissant) || game.Tables.Any(t => (t.Item?.IsCroissant() ?? false) || (t.Item?.IsCroissantAndPlate() ?? false)))
+            {
+                if (game.MyChef.HasSingleIngredient(Ingredient.ChoppedStrawberry) || game.MyChef.IsItemOnPlate(Ingredient.ChoppedStrawberry) || game.Tables.Any(t => (t.Item?.IsChoppedStrawberry() ?? false) || (t.Item?.IsChoppedStrawberryAndPlate() ?? false)))
+                {
+                    //Both things are available somewhere. Get a plate and then build the dish
+                    if (game.MyChef.HasPlate())
+                    {
+                        if (!game.MyChef.IsItemOnPlate(Ingredient.Croissant))
+                        {
+                            GetCroissant(game);
+                        }
+                        else if (!game.MyChef.IsItemOnPlate(Ingredient.ChoppedStrawberry))
+                        {
+                            GetChoppedStrawberry(game);
+                        }
+                        else if (!game.MyChef.IsItemOnPlate(Ingredient.Blueberry))
+                        {
+                            PutBlueberryOnPlate(game);
+                        }
+                        else if (!game.MyChef.IsItemOnPlate(Ingredient.IceCream))
+                        {
+                            PutIceCreamOnPlate(game);
+                        }
+                    }
+                    else
+                    {
+                        GetPlate(game);
+                    }
+                }
+                else
+                {
+                    ChopBerries(game);
+                }
+            }
+            else
+            {
+                GetCroissant(game);
+            }
+            return false;
         }
 
         public static bool MakeCroissantDoubleBerry(Game game)
@@ -817,6 +899,30 @@ namespace CodeAlaMode
                 Use(target.Position, "Pick Up IceCream");
             }
 
+            return false;
+        }
+
+        public static bool MakeTartSupport(Game game)
+        {
+            if (!game.MyChef.Item.ContainsIngredient(Ingredient.RawTart))
+            {
+                if (!game.MyChef.Item.ContainsIngredient(Ingredient.ChoppedDough))
+                {
+                    ChopDough(game);
+                }
+                else
+                {
+                    GetBlueberry(game);
+                }
+            }
+            else if (!game.MyChef.CanReach(game.Oven.Position))
+            {
+                MoveTo(game.Oven.Position, "Move to Oven");
+            }
+            else
+            {
+                SetItemDown(game);
+            }
             return false;
         }
 
@@ -1023,6 +1129,42 @@ namespace CodeAlaMode
             }
 
 
+            //Go to the target
+            var atTarget = game.MyChef.CanReach(target);
+            var isAvailable = (target == game.Blueberry || target.Item.IsBlueberry());
+
+            if (!atTarget && isAvailable)
+            {
+                MoveTo(target.Position, "Move to Blueberry");
+            }
+
+            //We're there and its available
+            if (atTarget && isAvailable)
+            {
+                Use(target.Position, "Pick Up Blueberry");
+            }
+
+            return false;
+        }
+
+        public static bool GetBlueberry(Game game)
+        {
+            //Move to Blueberry
+            Table target = null;
+            foreach (var table in game.Tables)
+            {
+                if (table.Item?.IsBlueberry() ?? false)
+                {
+                    target = table;
+                    break;
+                }
+            }
+
+            if (target == null)
+            {
+                target = game.Blueberry;//Go to the crate
+            }
+            
             //Go to the target
             var atTarget = game.MyChef.CanReach(target);
             var isAvailable = (target == game.Blueberry || target.Item.IsBlueberry());
