@@ -74,11 +74,26 @@ namespace TicTacToe
                     validMoves.Add(new Tuple<int, int>(row, col));
                 }
 
-                var randomMove = GetRandomMove(validMoves);
 
-                board.Set(randomMove.Item1, randomMove.Item2, TileState.O);
+                var move = board.FindWinningMove(TileState.O);
+
+                if (move == -1)
+                {
+                    Debug("Find Winning Move to block");
+                    move = board.FindWinningMove(TileState.X);
+                }
+                
+                if (move == -1)
+                {
+                    Debug("Find Random Move: ");
+                    move = board.FindEmptyTile();
+                }
+
+                board.Set(move, TileState.O);
                 Debug(board.Print());
-                Console.WriteLine(randomMove.Item1 + " " + randomMove.Item2);
+
+                var position = Board.TileToPoint(move);
+                Console.WriteLine(position.Item1 + " " + position.Item2);
                 
             }
         }
@@ -150,6 +165,17 @@ namespace TicTacToe
             return (row * 3) + col + 1;
         }
 
+        public static Tuple<int,int> TileToPoint(int tileNumber)
+        {
+            int row = 0;
+            int col = 0;
+            
+            row = (tileNumber - 1) / 3;
+            col = (tileNumber - 1) % 3;
+
+            return new Tuple<int, int>(row, col);
+        }
+
         public string Print()
         {
             var output = "";
@@ -167,6 +193,94 @@ namespace TicTacToe
                 }
             }
             return output;
+        }
+
+        public int FindEmptyTile()
+        {
+            var tile = -1;
+
+            for(int i=0;i<9;i++)
+            {
+                if(TileStates[i] == TileState.E)
+                {
+                    return i + 1;
+                }
+            }
+            return tile;
+        }
+
+        //Tries to find a winning tile for the given State
+        public int FindWinningMove(TileState tileState)
+        {
+            if(tileState == TileState.E)
+            {
+                throw new ArgumentException("TileState.E cannot have a winning state. Pass X or O for the tile state.");
+            }
+
+            int winningTile = -1;
+
+            if(TestRowForWin(1, 2, 3, tileState, out winningTile))
+            {
+                return winningTile;
+            }
+            else if (TestRowForWin(4, 5, 6, tileState, out winningTile))
+            {
+                return winningTile;
+            }
+            else if (TestRowForWin(7, 8, 9, tileState, out winningTile))
+            {
+                return winningTile;
+            }
+            else if (TestRowForWin(1, 4, 7, tileState, out winningTile))
+            {
+                return winningTile;
+            }
+            else if (TestRowForWin(2, 5, 8, tileState, out winningTile))
+            {
+                return winningTile;
+            }
+            else if (TestRowForWin(3, 6, 9, tileState, out winningTile))
+            {
+                return winningTile;
+            }
+            else if (TestRowForWin(1, 5, 9, tileState, out winningTile))
+            {
+                return winningTile;
+            }
+            else if (TestRowForWin(3, 5, 7, tileState, out winningTile))
+            {
+                return winningTile;
+            }
+
+            return winningTile;
+        }
+
+        private bool TestRowForWin(int tile1, int tile2, int tile3, TileState player, out int winningTile)
+        {
+            List<TileState> states = new List<TileState> { Get(tile1), Get(tile2), Get(tile3) };
+            List<TileState> goodStates = new List<TileState> { player, TileState.E };
+            
+            //If 2 of the cells have my player and all of them are good (player or Empty)
+            if (states.Count(state => state == player) == 2 && states.All(state => goodStates.Contains(state)))
+            {
+                if (IsEmpty(tile1))
+                {
+                    winningTile = tile1;
+                    return true;
+                }
+                else if (IsEmpty(tile2))
+                {
+                    winningTile = tile2;
+                    return true;
+                }
+                else
+                {
+                    winningTile = tile3;
+                    return true;
+                }
+            }
+            winningTile = -1;
+            return false;
         }
     }
 
