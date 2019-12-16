@@ -6,7 +6,16 @@ using System.Text;
 using System.Collections;
 using System.Collections.Generic;
 
-//https://www.codingame.com/contests/code-a-la-mode
+
+/* Original Contest: https://www.codingame.com/contests/code-a-la-mode
+ * Now as a Puzzle: https://www.codingame.com/ide/puzzle/code-a-la-mode
+ * 
+ * Currently this only gets midway into Bronze League
+ */
+
+
+
+
 namespace CodeAlaMode
 {
 
