@@ -593,8 +593,11 @@ namespace CodeAlaMode
 
                 //Oven stuff
                 inputs = ReadLine().Split(' ');
-                game.Oven.Contents = new Item(inputs[0]);
-                game.Oven.Timer = int.Parse(inputs[1]);
+                if(game.Oven != null)
+                {
+                    game.Oven.Contents = new Item(inputs[0]);
+                    game.Oven.Timer = int.Parse(inputs[1]);
+                }
 
                 //Customer stuff, the number of customers currently waiting for food
                 int numCustomers = int.Parse(ReadLine());
