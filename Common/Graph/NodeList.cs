@@ -10,7 +10,7 @@ Update January 2005
 
 using System.Collections.ObjectModel;
 
-namespace CodingGame.Graph
+namespace Common.Graph
 {
     public class NodeList<T> : Collection<Node<T>>
     {

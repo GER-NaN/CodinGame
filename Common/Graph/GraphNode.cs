@@ -10,7 +10,7 @@ Update January 2005
 
 using System.Collections.Generic;
 
-namespace CodingGame.Graph
+namespace Common.Graph
 {
     /*
      * Neighbors and Costs are used as parallel lists where the index of an item relates it to the counterpart.

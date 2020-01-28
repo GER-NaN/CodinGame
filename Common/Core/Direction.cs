@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CodingGame.Core
+namespace Common.Core
 {
     public enum Direction
     {

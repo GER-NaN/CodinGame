@@ -9,7 +9,7 @@ Scott Mitchell
 Update January 2005
 */
 
-namespace CodingGame.Graph
+namespace Common.Graph
 {
     public class Node<T>
     {

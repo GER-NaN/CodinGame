@@ -4,7 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 
-namespace CodingGame.TileMap
+namespace Common.TileMap
 {
     public class TileMap<T>
     {

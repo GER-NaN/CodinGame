@@ -11,7 +11,7 @@ Update January 2005
 using System.Collections.Generic;
 using System.Linq;
 
-namespace CodingGame.Graph
+namespace Common.Graph
 {
     public class Graph<T>
     {
