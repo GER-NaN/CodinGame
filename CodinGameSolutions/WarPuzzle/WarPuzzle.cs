@@ -36,8 +36,6 @@ namespace WarPuzzle
                 DebugTool.Print(c);
             }
 
-            int p1Wins = 0;
-            int p2Wins = 0;
             int rounds = 0;
 
             List<Card> p1CardPile = new List<Card>();
@@ -58,7 +56,6 @@ namespace WarPuzzle
                 {
                     p1Hand.AddCards(p1CardPile);
                     p1Hand.AddCards(p2CardPile);
-                    p1Wins++;
                     p1CardPile.Clear();
                     p2CardPile.Clear();
                     rounds++;
@@ -68,25 +65,25 @@ namespace WarPuzzle
                 {
                     p2Hand.AddCards(p1CardPile);
                     p2Hand.AddCards(p2CardPile);
-                    p2Wins++;
                     p1CardPile.Clear();
                     p2CardPile.Clear();
                     rounds++;
                 }
-                else
+                else//War
                 {
-                    if(p1Hand.Count() < 4 || p2Hand.Count() < 4)
-                    {
-                        //They cant play war, game is over
-                        p1Wins++;
-                        p2Wins++;
-                    }
-                    else
+                    if(p1Hand.Count() >= 4 && p2Hand.Count() >= 4)
                     {
                         //Put 3 cards into their pile
                         p1CardPile.AddRange(p1Hand.Deal(3));
                         p2CardPile.AddRange(p2Hand.Deal(3));
                     }
+                    else
+                    {
+                        //Clear decks to provide an equally first
+                        p1Hand.ClearDeck();
+                        p2Hand.ClearDeck();
+                    }
+
                 }
 
                 if(p1Hand.Count() == 0 || p2Hand.Count() == 0)
@@ -95,19 +92,20 @@ namespace WarPuzzle
                 }
             }
 
-            string winner = "PAT";//tie
 
-            if(p1Wins > p2Wins )
+            if(p1Hand.Count() > p2Hand.Count())
             {
-                winner = "1";
+                Output.Print("1 " + rounds);
             }
-            else if(p1Wins < p2Wins)
+            else if(p2Hand.Count() > p1Hand.Count())
             {
-                winner = "2";
+                Output.Print("2 " + rounds);
+            }
+            else
+            {
+                Output.Print("PAT");//Tie
             }
 
-            Output.Print(winner + " " + rounds);
-            
             Console.ReadLine();
         }
     }

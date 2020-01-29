@@ -66,5 +66,10 @@ namespace Common.PlayingCards
         {
             return cards.Count();
         }
+
+        public void ClearDeck()
+        {
+            cards.Clear();
+        }
     }
 }

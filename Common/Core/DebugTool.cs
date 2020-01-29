@@ -17,5 +17,14 @@ namespace Common.Core
         {
             Print(label + ": " + o);
         }
+
+        /// <summary>Prints each item on its own line</summary>
+        public static void PrintAll(object[] items)
+        {
+            foreach(var item in items)
+            {
+                Print(item);
+            }
+        }
     }
 }
