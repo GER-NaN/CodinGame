@@ -20,14 +20,23 @@ namespace Common.Core
             Console.Out.WriteLine(o?.ToString());
         }
 
-        /// <summary>
-        /// Outputs the object with the label prefixed using WriteLine. No space or seperating character is included.
-        /// </summary>
-        /// <param name="label">The label to prefix to the object</param>
-        /// <param name="o">The object to print</param>
-        public static void Print(string label, object o)
+        /// <summary>Prints the objects to Console with the specified seperator </summary>
+        /// <param name="a">An object</param>
+        /// <param name="b">An object</param>
+        /// <param name="seperator">The seperator to place between each object</param>
+        public static void Print(object a, object b, string seperator = " ")
         {
-            Print(label + o);
+            Console.WriteLine($"{a}{seperator}{b}");
+        }
+
+        /// <summary>Prints the objects to Console with the specified seperator </summary>
+        /// <param name="a">An object</param>
+        /// <param name="b">An object</param>
+        /// <param name="c">An object</param>
+        /// <param name="seperator">The seperator to place between each object</param>
+        public static void Print(object a, object b, object c, string seperator = " ")
+        {
+            Console.WriteLine($"{a}{seperator}{b}{seperator}{c}");
         }
     }
 }

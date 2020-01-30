@@ -13,9 +13,19 @@ namespace Common.Core
             Console.Error.WriteLine(o?.ToString());
         }
 
-        public static void Print(string label, object o)
+        public static void Print(object a, object b, string seperator = " ")
         {
-            Print(label + ": " + o);
+            Print($"{a}{seperator}{b}");
+        }
+
+        public static void Print(object a, object b, object c, string seperator = " ")
+        {
+            Print($"{a}{seperator}{b}{seperator}{c}");
+        }
+
+        public static void Print(object a, object b, object c, object d, string seperator = " ")
+        {
+            Print($"{a}{seperator}{b}{seperator}{c}{seperator}{d}");
         }
 
         /// <summary>Prints each item on its own line</summary>

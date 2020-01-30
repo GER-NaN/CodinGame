@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WarPuzzle", "WarPuzzle\WarP
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "..\Common\Common.csproj", "{D1CF492B-2577-4368-84B4-D74A548ED166}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkCablingPuzzle", "NetworkCablingPuzzle\NetworkCablingPuzzle.csproj", "{38DE971B-3BBE-4C21-94C7-8CA42271773A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{D1CF492B-2577-4368-84B4-D74A548ED166}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D1CF492B-2577-4368-84B4-D74A548ED166}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D1CF492B-2577-4368-84B4-D74A548ED166}.Release|Any CPU.Build.0 = Release|Any CPU
+		{38DE971B-3BBE-4C21-94C7-8CA42271773A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{38DE971B-3BBE-4C21-94C7-8CA42271773A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{38DE971B-3BBE-4C21-94C7-8CA42271773A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{38DE971B-3BBE-4C21-94C7-8CA42271773A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
