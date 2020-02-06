@@ -48,6 +48,8 @@
   <ItemGroup>
     <Compile Include="Core\DebugTool.cs" />
     <Compile Include="Core\Direction.cs" />
+    <Compile Include="Core\DirectionExtensions.cs" />
+    <Compile Include="Core\DirectionHelper.cs" />
     <Compile Include="Core\Input.cs" />
     <Compile Include="Core\Output.cs" />
     <Compile Include="Graph\Graph.cs" />
