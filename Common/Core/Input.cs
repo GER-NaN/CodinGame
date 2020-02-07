@@ -33,5 +33,22 @@ namespace Common.Core
             return new Tuple<T1, T2>(item1, item2);
         }
 
+
+        /// <summary> Reads a line from Console and splits the T elements using the specified seperator  </summary>
+        /// <typeparam name="T">The type to convert each element into</typeparam>
+        /// <param name="seperator">The seperator between the elements. A single space is used by default</param>
+        /// <returns></returns>
+        public static List<T> ReadItems<T>(char seperator = ' ')
+        {
+            List<T> items = new List<T>();
+            object[] input = Console.ReadLine().Split(seperator);
+            foreach(object item in input)
+            {
+                items.Add((T)Convert.ChangeType(item, typeof(T)));
+            }
+
+            return items;
+        }
+
     }
 }

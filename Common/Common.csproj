@@ -60,10 +60,11 @@
     <Compile Include="PlayingCards\CardCompareOption.cs" />
     <Compile Include="PlayingCards\Deck.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="StandardExtensions\DoubleExtensions.cs" />
-    <Compile Include="StandardExtensions\EnumerableExtensions.cs" />
-    <Compile Include="StandardExtensions\IntegerExtensions.cs" />
-    <Compile Include="StandardExtensions\LongExtensions.cs" />
+    <Compile Include="StandardTypeExtensions\DoubleExtensions.cs" />
+    <Compile Include="StandardTypeExtensions\EnumerableExtensions.cs" />
+    <Compile Include="StandardTypeExtensions\IntegerExtensions.cs" />
+    <Compile Include="StandardTypeExtensions\LongExtensions.cs" />
+    <Compile Include="StandardTypeExtensions\StringExtensions.cs" />
     <Compile Include="TileMap\Tile.cs" />
     <Compile Include="TileMap\TileMap.cs" />
   </ItemGroup>
