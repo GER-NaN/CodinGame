@@ -17,9 +17,8 @@ namespace Common.TileMap
             Point = p;
         } 
 
-        public Tile(Point p, T item)
+        public Tile(Point p, T item): this(p)
         {
-
             Item = item;
         }
 

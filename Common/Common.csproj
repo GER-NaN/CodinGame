@@ -71,6 +71,8 @@
     <Compile Include="StandardTypeExtensions\StringExtensions.cs" />
     <Compile Include="TileMap\Tile.cs" />
     <Compile Include="TileMap\TileMap.cs" />
+    <Compile Include="TileMap\TileMapPath.cs" />
+    <Compile Include="TileMap\TileMapPathStep.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

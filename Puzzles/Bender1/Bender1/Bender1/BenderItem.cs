@@ -22,4 +22,18 @@ namespace Bender1
         Teleporter = 'T',
         Empty = ' '
     }
+
+    public static class BenderItemExtensions
+    {
+        public static bool IsObstacle(this BenderItem item)
+        {
+            if (item == BenderItem.ObstacleUnbreakable || item == BenderItem.ObstacleBreakable)
+            {
+                return true;
+            }
+
+            return false;
+        }
+    }
+
 }

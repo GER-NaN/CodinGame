@@ -1,4 +1,6 @@
-﻿using Common.StandardTypeExtensions;
+﻿using Common.Core;
+using Common.StandardTypeExtensions;
+using Common.TileMap;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,22 +20,158 @@ namespace Bender1
             int lines = int.Parse(inputs[0]);
             int columns = int.Parse(inputs[1]);
 
-            char[,] map = new char[lines,columns];
+            BenderItem[,] mapInputs = new BenderItem[lines, columns];
             for (int i = 0; i < lines; i++)
             {
                 char[] line = Console.ReadLine().ToCharArray();
-                for(int j = 0;j<line.Length;j++)
+                for (int j = 0; j < line.Length; j++)
                 {
-                    map[i, j] = line[j];
+                    mapInputs[i, j] = (BenderItem)line[j];
                 }
             }
             /*********************************/
 
-            //Find starting position
-            Console.WriteLine(map.ElementExists('@'));
-            Console.WriteLine(map.PositionOf('@'));
+            //Initialize our map and starting position
+            var map = new TileMap<BenderItem>(mapInputs);
+            var path = new TileMapPath<BenderItem>();
+            var currentDirection = "SOUTH";
+            var currentPosition = map.Find(BenderItem.Start);
 
 
+            var output = "";
+            var looping = false;
+            var completed = false;
+            var breaker = false;
+            var inverter = false;
+
+            while (!completed && !looping)
+            {
+                //Add our postion to the path
+                path.AddToPath(currentPosition);
+
+                //Check for loop
+                //Check if we are looping
+                if (path.ContainsLoop(5))
+                {
+                    completed = true;
+                    looping = true;
+                }
+
+                // 1.Examine current position and see if we need to do anything
+                switch (currentPosition.Item)
+                {
+                    case BenderItem.SuicideBooth:
+                        completed = true;
+                        break;
+                    case BenderItem.ModifierNorth:
+                        currentDirection = "NORTH";
+                        break;
+                    case BenderItem.ModifierEast:
+                        currentDirection = "EAST";
+                        break;
+                    case BenderItem.ModifierSouth:
+                        currentDirection = "SOUTH";
+                        break;
+                    case BenderItem.ModifierWest:
+                        currentDirection = "WEST";
+                        break;
+                    case BenderItem.Beer:
+                        breaker = !breaker;
+                        break;
+                    case BenderItem.CircuitInverter:
+                        inverter = !inverter;
+                        break;
+                    case BenderItem.Teleporter:
+                        var teleporters = map.FindAll(BenderItem.Teleporter); //Guaranteed to only be 2 of them
+                        var newPosition = teleporters[0];
+                        if (newPosition == currentPosition)
+                        {
+                            newPosition = teleporters[1];
+                        }
+                        currentPosition = newPosition;
+                        break;
+                }
+
+                // 2.Determine Direction to go
+                // - Is direction passable
+                //      -Move to the tile
+                // - Is direction NOT passable
+                //      - Check if we can break it(breaker mode on and breakable obstacle
+                //          - Break Wall and remove from map
+                //          - Move to the tile
+                //      - Change direction of travel according to rules
+
+                //var nextTile = map.TileAt()
+                if(!completed)
+                {
+                    var moved = false;
+                    while (!moved)
+                    {
+                        var tileToTry = map.TileAt(currentPosition.Point, currentDirection.ToDirection());
+
+                        if (!tileToTry.Item.IsObstacle())
+                        {
+                            //Move to the tile
+                            currentPosition = tileToTry;
+                            moved = true;
+                        }
+                        else
+                        {
+                            if (breaker && tileToTry.Item == BenderItem.ObstacleBreakable)
+                            {
+                                //Break wall
+                                tileToTry.Item = BenderItem.Empty;
+
+                                //Move to tile
+                                currentPosition = tileToTry;
+                                moved = true;
+                            }
+                            else
+                            {
+                                //We have hit an obstacle we cannot pass. Try turning according to priority.
+                                var testDirection = Direction.South;
+                                if (inverter)
+                                {
+                                    testDirection = Direction.West;
+                                }
+
+                                tileToTry = map.TileAt(currentPosition.Point, testDirection);
+
+                                //Find somehwere to go, assume there is one...
+                                while(tileToTry.Item.IsObstacle())
+                                {
+                                    if(inverter)
+                                    {
+                                        testDirection = testDirection.RelativeRight();
+                                        tileToTry = map.TileAt(currentPosition.Point, testDirection);
+                                    }
+                                    else
+                                    {
+                                        testDirection = testDirection.RelativeLeft();
+                                        tileToTry = map.TileAt(currentPosition.Point, testDirection);
+                                    }
+                                }
+
+                                currentPosition = tileToTry;
+                                currentDirection = testDirection.ToString();
+                                moved = true;
+                            }
+                        }
+                    }
+                    
+                    //output the direction we moved
+                    output += currentDirection.ToUpper() + Environment.NewLine;
+                }
+            }
+
+            if (looping)
+            {
+                Console.WriteLine("LOOP");
+            }
+            else
+            {
+                Console.WriteLine(output);
+            }
 
             Console.ReadLine();
         }

@@ -9,6 +9,10 @@ namespace Common.Core
          Left,
          Right,
          Top,
-         Bottom
+         Bottom,
+         North,
+         South,
+         East,
+         West
     }
 }
