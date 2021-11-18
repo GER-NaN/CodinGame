@@ -24,7 +24,17 @@ namespace Common.TileMap
 
         /// <summary> Poor Mans loop checker. If we have passed the same 2 tiles more than x times, consider us looping. </summary>
         /// <param name="loopCounter">How many times to count passing over the same two tiles before we consider us looping.</param>
-        /// <returns></returns>
+        /// <returns>True if any two tiles appear adjacent to eachother anywhere in the path more than loopCounter times</returns>
+        /// <remarks>
+        /// This is a flawed algorithm but it works for simple cases and our Bender1 puzzle.
+        /// 
+        /// For example, consider the path below. If we look for Tiles [A] [B] repeating, we will find two instances of them. The
+        /// function would return as "looping = true" when in fact the path continues on without loopoing.
+        /// 
+        /// [A] [B] [C] [D] [Z] [A] [G] [T] [A] [B] [Z] [V] [V] [A] [B] [T] [Q] [R]...
+        ///  ^   ^                           ^   ^               ^   ^
+        /// T1  T2                         First Repeat       Second Repeat 
+        /// </remarks>
         public bool ContainsLoop(int loopCounter)
         {
             var loopFound = false;
