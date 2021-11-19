@@ -9,6 +9,8 @@ namespace Common.TileMap
 {
     public class TileMap<T>
     {
+        private Random random = new Random(Guid.NewGuid().GetHashCode());
+
         public List<Tile<T>> Tiles;
         public readonly int Width;
         public readonly int Height;
@@ -57,6 +59,12 @@ namespace Common.TileMap
         public Tile<T> Find(T item)
         {
             return Tiles.FirstOrDefault(t => t.Item.Equals(item));
+        }
+
+        //Untested - Finds a tile based on a function of the item it contains.
+        public Tile<T> Find(Func<Tile<T>,bool> predicate)
+        {
+            return Tiles.FirstOrDefault(predicate);
         }
 
 
@@ -143,6 +151,14 @@ namespace Common.TileMap
                 sb.Append(Environment.NewLine);
             }
             return sb.ToString();
+        }
+
+        public Tile<T> GetRandomTile()
+        {
+            var x = random.Next() % Width;
+            var y = random.Next() % Height;
+
+            return this.TileAt(x, y);
         }
     }
 }
