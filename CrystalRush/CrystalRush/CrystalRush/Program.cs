@@ -88,11 +88,9 @@ class Program
 
             for (int i = 0; i < 5; i++)
             {
-                //Only have 1 robot do work
-                if(i == 0)
+                Robot robot = myRobots[i];
+                if (i == 0)
                 {
-                    Robot robot = myRobots[i];
-
                     var strategy = new StrategyRadarSearch();
                     var move = strategy.GetMove(map, robot);
 
@@ -100,7 +98,10 @@ class Program
                 }
                 else
                 {
-                    Console.WriteLine("WAIT");
+                    var strategy = new StrategySearchOre();
+                    var move = strategy.GetMove(map, robot);
+
+                    Console.WriteLine(move);
                 }
 
             }

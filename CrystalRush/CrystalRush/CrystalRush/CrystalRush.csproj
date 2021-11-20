@@ -54,6 +54,7 @@
     <Compile Include="Robot.cs" />
     <Compile Include="StrategyRadarSearch.cs" />
     <Compile Include="StrategySearchArea.cs" />
+    <Compile Include="StrategySearchOre.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
