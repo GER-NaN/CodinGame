@@ -18,13 +18,15 @@ class Program
         int height = int.Parse(inputs[1]); // size of the map
 
 
+        var myRobots = new List<Robot>();
+        var map = new TileMap<CrystalRushCell>(width, height);
+        var roundNumber = 0;
 
         // game loop
         while (true)
         {
-            //Reset map
-            var map = new TileMap<CrystalRushCell>(width, height);
-            var myRobots = new List<Robot>();
+            roundNumber++;
+
 
             inputs = Console.ReadLine().Split(' ');
             int myScore = int.Parse(inputs[0]); // Amount of ore delivered
@@ -38,7 +40,14 @@ class Program
                 {
                     string ore = inputs[2 * j];// amount of ore or "?" if unknown
                     int hole = int.Parse(inputs[2 * j + 1]);// 1 if cell has a hole
-                    map.TileAt(j, i).Item = new CrystalRushCell(ore, hole);
+
+                    if(map.TileAt(j,i).Item == null)
+                    {
+                        map.TileAt(j, i).Item = new CrystalRushCell(false,0,false,false);
+                    }
+
+                    map.TileAt(j, i).Item.Ore = (ore == "?" ? 0 : int.Parse(ore));
+                    map.TileAt(j, i).Item.IsHole = Convert.ToBoolean(hole);
                 }
             }
 
@@ -48,6 +57,7 @@ class Program
             int trapCooldown = int.Parse(inputs[2]); // turns left until a new trap can be requested
 
             //Entities
+            var ySearchArea = 0;
             for (int i = 0; i < entityCount; i++)
             {
                 inputs = Console.ReadLine().Split(' ');
@@ -58,79 +68,41 @@ class Program
                 int y = int.Parse(inputs[3]); // position of the entity
                 int item = int.Parse(inputs[4]); // if this entity is a robot, the item it is carrying (-1 for NONE, 2 for RADAR, 3 for TRAP, 4 for ORE)
 
-                CrystalRushItem entity;
-                if (entityType == 0 || entityType == 1)
+                //Only handle my robots for now
+                if (entityType == 0)
                 {
-                    entity = new Robot(entityId, (CrystalRushItemType)entityType, new System.Drawing.Point(x, y));
-                    (entity as Robot).SetItemHeld((CrystalRushItemType)item);
-
-
-                    if (entity.Type == CrystalRushItemType.MyRobot)
+                    var robot = new Robot(entityId, (CrystalRushItemType)entityType, new System.Drawing.Point(x, y));
+                    robot.SetItemHeld((CrystalRushItemType)item);
+                    if(roundNumber == 1)
                     {
-                        myRobots.Add(entity as Robot);
+                        myRobots.Add(robot);
+                        robot.YStart = ySearchArea * 3;
+                        ySearchArea++;
                     }
-                }
-                else
-                {
-                    entity = new CrystalRushItem(entityId, (CrystalRushItemType) entityType, new System.Drawing.Point(x, y));
-                    //Not doing anything with the enemy robots
+                    else
+                    {
+                        myRobots.First(r => r.Id == robot.Id).Update(robot);
+                    }
                 }
             }
 
             for (int i = 0; i < 5; i++)
             {
-                Robot robot = myRobots[i];
-
-                //The lowest Robot will do radar stuff
-                if(robot.Id == myRobots.OrderBy(r => r.Id).First().Id)
+                //Only have 1 robot do work
+                if(i == 0)
                 {
-                    if(robot.ItemHeld != CrystalRushItemType.Radar && robot.Position.X != 0)
-                    {
-                        Console.WriteLine($"MOVE 0 {robot.Position.Y} (R)GO:HQ");
-                    }
-                    else if(robot.ItemHeld != CrystalRushItemType.Radar && robot.Position.X == 0)
-                    {
-                        Console.WriteLine("REQUEST RADAR");
-                    }
-                    else if(robot.ItemHeld == CrystalRushItemType.Radar && robot.Position.X == 0)
-                    {
-                        //Go somewhere random
-                        var destination = map.GetRandomTile();
-                        Console.WriteLine($"MOVE {destination.Point.X} {destination.Point.Y} (R)GO");
-                    }
-                    else
-                    {
-                        //Make sure the robot goes out into the map, we havent saved state or travel yet.
-                        if(robot.Position.X < 9)
-                        {
-                            //Go somewhere random
-                            var destination = map.GetRandomTile();
-                            Console.WriteLine($"MOVE {destination.Point.X} {destination.Point.Y} (R)GO");
-                        }
-                        else
-                        {
-                            Console.WriteLine($"DIG {robot.Position.X} {robot.Position.Y} (R)PLANT");
-                        }
-                    }
+                    Robot robot = myRobots[i];
+
+                    var strategy = new StrategyRadarSearch();
+                    var move = strategy.GetMove(map, robot);
+
+                    Console.WriteLine(move);
                 }
                 else
                 {
-                    if (robot.ItemHeld == CrystalRushItemType.Ore)
-                    {
-                        Console.WriteLine($"MOVE 0 {robot.Position.Y} GO:HQ");
-                    }
-                    else if (map.TileAt(robot.Position).Item.Ore > 0)
-                    {
-                        Console.WriteLine($"DIG {robot.Position.X} {robot.Position.Y} DIG");
-                    }
-                    else
-                    {
-                        //Go somewhere random
-                        var destination = map.GetRandomTile();
-                        Console.WriteLine($"MOVE {destination.Point.X} {destination.Point.Y} SEARCH");
-                    }
+                    Console.WriteLine("WAIT");
                 }
- 
+
             }
         }
     }

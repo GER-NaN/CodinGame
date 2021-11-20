@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Common.Core;
+using Common.TileMap;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -31,6 +33,8 @@ namespace CrystalRush
     {
 
         public CrystalRushItemType ItemHeld;
+        public Point TopLeft;
+        public Point BottomRight;
 
         public Robot(int id, CrystalRushItemType type, Point position) : base(id,type,position)
         {
@@ -41,5 +45,13 @@ namespace CrystalRush
         {
             ItemHeld = item;
         }
+
+        public void Update(Robot robot)
+        {
+            this.SetPosition(robot.Position);
+            this.SetItemHeld(robot.ItemHeld);
+        }
+
+        public int YStart = 0;
     }
 }

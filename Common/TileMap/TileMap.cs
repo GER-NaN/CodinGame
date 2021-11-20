@@ -1,4 +1,5 @@
 ﻿using Common.Core;
+using Common.StandardTypeExtensions;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -61,10 +62,30 @@ namespace Common.TileMap
             return Tiles.FirstOrDefault(t => t.Item.Equals(item));
         }
 
-        //Untested - Finds a tile based on a function of the item it contains.
+        /// <summary> Finds the first tile that matches the predicate condition</summary>
+        /// <param name="predicate"></param>
+        /// <returns></returns>
         public Tile<T> Find(Func<Tile<T>,bool> predicate)
         {
             return Tiles.FirstOrDefault(predicate);
+        }
+
+        /// <summary> Finds all tiles that matche the predicate condition</summary>
+        /// <param name="predicate"></param>
+        /// <returns></returns>
+        public List<Tile<T>> FindAll(Func<Tile<T>, bool> predicate)
+        {
+            return Tiles.Where(predicate).ToList();
+        }
+
+        /// <summary> Finds the first tile that matches the predicate condition</summary>
+        /// <param name="predicate"></param>
+        /// <returns></returns>
+        public Tile<T> FindNearest(Func<Tile<T>, bool> predicate, Point p)
+        {
+            var tiles = Tiles.Where(predicate);
+            return tiles.OrderBy(tile => p.DistanceTo(tile.Point)).FirstOrDefault();
+
         }
 
 
