@@ -9,12 +9,12 @@ namespace Common.TileMap
 {
     public class Tile<T>
     {
-        public Point Point;
+        public Point Position;
         public T Item;
 
         public Tile(Point p)
         {
-            Point = p;
+            Position = p;
         } 
 
         public Tile(Point p, T item): this(p)
@@ -24,13 +24,13 @@ namespace Common.TileMap
 
         public Tile(Tile<T> tile)
         {
-            Point = new Point(tile.Point.X, tile.Point.Y);
+            Position = new Point(tile.Position.X, tile.Position.Y);
             Item = tile.Item;
         }
 
         public override string ToString()
         {
-            return $"({Point.X},{Point.Y}) > {Item}";
+            return $"({Position.X},{Position.Y}) > {Item}";
         }
     }
 }

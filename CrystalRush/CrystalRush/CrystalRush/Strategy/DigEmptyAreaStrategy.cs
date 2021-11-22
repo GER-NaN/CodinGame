@@ -6,17 +6,17 @@ using System.Threading.Tasks;
 using Common.Core;
 using Common.TileMap;
 
-namespace CrystalRush
+namespace CrystalRush.Strategy
 {
     //Searches an area and digs all Tiles that are not a hole
-    public class StrategySearchArea : IRobotStrategy
+    public class DigEmptyAreaStrategy : IRobotStrategy
     {
         public string GetMove(TileMap<CrystalRushCell> map, Robot robot)
         {
             var action = "WAIT";
 
-            //Find the closest tile in my area 
-            var destination = map.FindNearest(tile => tile.Item.IsHole == false && tile.Point.X > 6 && tile.Point.Y >= robot.YStart && tile.Point.Y < robot.YStart + 3, robot.Position);
+            //Find the closest tile in my area, TODO: Make the search area more defined (better than just a Y coord)
+            var destination = map.FindNearest(tile => tile.Item.IsHole == false && tile.Position.X > 6 && tile.Position.Y >= robot.YStart && tile.Position.Y < robot.YStart + 3, robot.Position);
 
             //If we have ore, go to HQ
             if (robot.ItemHeld == CrystalRushItemType.Ore)
@@ -26,13 +26,13 @@ namespace CrystalRush
             //If we dont have any tiles in our area, go somehwere random
             else if (destination == null)
             {
-                destination = map.Find(tile => tile.Item.IsHole == false && tile.Point.X > 0);
-                action = $"MOVE {destination.Point.X} {destination.Point.Y} SEARCH:Rand";
+                destination = map.Find(tile => tile.Item.IsHole == false && tile.Position.X > 0);
+                action = $"MOVE {destination.Position.X} {destination.Position.Y} SEARCH:Rand";
             }
             //If we are not at our destiation, go there
-            else if (robot.Position != destination.Point)
+            else if (robot.Position != destination.Position)
             {
-                action = $"MOVE {destination.Point.X} {destination.Point.Y} SEARCH:Area";
+                action = $"MOVE {destination.Position.X} {destination.Position.Y} SEARCH:Area";
             }
             //We're at our destination, Dig it
             else

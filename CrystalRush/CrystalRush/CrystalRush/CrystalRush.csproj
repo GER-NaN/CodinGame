@@ -47,14 +47,18 @@
     <Compile Include="CrystalRushCell.cs" />
     <Compile Include="CrystalRushItem.cs" />
     <Compile Include="CrystalRushItemType.cs" />
-    <Compile Include="IRobotStrategy.cs" />
+    <Compile Include="Strategy\IRobotStrategy.cs" />
     <Compile Include="Map.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Robot.cs" />
-    <Compile Include="StrategyRadarSearch.cs" />
-    <Compile Include="StrategySearchArea.cs" />
-    <Compile Include="StrategySearchOre.cs" />
+    <Compile Include="Strategy\DeadStrategy.cs" />
+    <Compile Include="Strategy\NoStrategy.cs" />
+    <Compile Include="Strategy\RadarStrategy.cs" />
+    <Compile Include="Strategy\DigEmptyAreaStrategy.cs" />
+    <Compile Include="Strategy\DigOreStrategy.cs" />
+    <Compile Include="Strategy\TrapXStrategy.cs" />
+    <Compile Include="Strategy\TrapOreStrategy.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -66,4 +70,7 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>C:\Source\Repos\SourceCombiner\SourceCombiner\SourceCombiner\bin\Debug\SourceCombiner.exe "C:\Source\Repos\CodinGame\CrystalRush\CrystalRush\CrystalRush.sln" c:\temp\crystal.txt true</PostBuildEvent>
+  </PropertyGroup>
 </Project>

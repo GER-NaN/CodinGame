@@ -79,12 +79,13 @@ namespace Common.TileMap
         }
 
         /// <summary> Finds the first tile that matches the predicate condition</summary>
-        /// <param name="predicate"></param>
+        /// <param name="predicate">The predicate condition for matching tiles</param>
+        /// <param name="p">The point to start looking from</param>
         /// <returns></returns>
         public Tile<T> FindNearest(Func<Tile<T>, bool> predicate, Point p)
         {
             var tiles = Tiles.Where(predicate);
-            return tiles.OrderBy(tile => p.DistanceTo(tile.Point)).FirstOrDefault();
+            return tiles.OrderBy(tile => p.DistanceTo(tile.Position)).FirstOrDefault();
 
         }
 
@@ -92,10 +93,10 @@ namespace Common.TileMap
         /// <summary>Gets the tile at the specified x y coordinates</summary>
         public Tile<T> TileAt(int x, int y)
         {
-            return Tiles.FirstOrDefault(t => t.Point.X == x && t.Point.Y == y);
+            return Tiles.FirstOrDefault(t => t.Position.X == x && t.Position.Y == y);
         }
 
-        /// <summary>Gets the tile at the Point including an optional offset in y and x directions</summary>
+        /// <summary>Gets the tile at the Point</summary>
         /// <param name="p">The point where the tile is located</param>
         public Tile<T> TileAt(Point p)
         {
