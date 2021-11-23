@@ -53,7 +53,7 @@ namespace CrystalRush.GameStrategy
 
             //If we need radars, grab one of the diggers
             var radarOreLimit = 20;
-            var needRadar = Map.FindAll(cell => cell.Item.Ore > 0).Sum(cell => cell.Item.Ore) < radarOreLimit;
+            var needRadar = Map.FindAll(cell => cell.Item.Ore > 0 && !cell.Item.Avoid).Sum(cell => cell.Item.Ore) < radarOreLimit;
 
             if (needRadar && !Bots.Any(r => r.Strategy is RadarClusterStrategy))
             {

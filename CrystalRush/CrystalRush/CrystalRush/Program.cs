@@ -133,7 +133,6 @@ class Program
             foreach(var trapPosition in trapDetector)
             {
                 map.TileAt(trapPosition).Item.Avoid = true;
-                DebugTool.Print("Trap @", trapPosition);
             }
 
             //Mark Dead robots
