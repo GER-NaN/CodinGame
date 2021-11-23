@@ -27,7 +27,7 @@ namespace Common.StandardExtensions
         /// <param name="upper">The upper bound</param>
         /// <param name="inclusive">Should the lower and upper bounds be inclusive, default is true</param>
         /// <returns></returns>
-        public static bool Between(this int val, int lower, int upper, bool inclusive = true)
+        public static bool IsBetween(this int val, int lower, int upper, bool inclusive = true)
         {
             if(inclusive)
             {
@@ -37,6 +37,33 @@ namespace Common.StandardExtensions
             {
                 return val > lower && val < upper;
             }
+        }
+
+        /// <summary>Restrains the int to within the values specified. If the int is outside the bounds it will be set to the closest bound (lower or upper). By default the bounds are included</summary>
+        /// <param name="val">The value to bind</param>
+        /// <param name="lower">The lower bound</param>
+        /// <param name="upper">The upper bound</param>
+        /// <param name="inclusive">Should the lower and upper bounds be inclusive, default is true</param>
+        /// <returns>The integer will be returned if it is within the bounds or the closes bound if its outside</returns>
+        public static int RestrainWithin(this int val, int lower, int upper, bool inclusive = true)
+        {
+            if(val.IsBetween(lower,upper,inclusive))
+            {
+                return val;
+            }
+
+            var boundValue = 0;
+            if(inclusive)
+            {
+                boundValue = (val < lower) ? lower : upper;
+            }
+            else
+            {
+                boundValue = (val <= lower) ? (lower + 1) : (upper - 1);
+            }
+
+            return boundValue;
+
         }
     }
 }

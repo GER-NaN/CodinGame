@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Common.TileMap;
 
-namespace CrystalRush.Strategy
+namespace CrystalRush.BotStrategy
 {
     public class DeadStrategy : IRobotStrategy
     {

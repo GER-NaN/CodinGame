@@ -6,8 +6,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CrystalRush.Strategy
+namespace CrystalRush.BotStrategy
 {
+    /// <summary> A DIG ore strategy where it prefers safe ore</summary>
     public class DigOreStrategy : IRobotStrategy
     {
         /// <summary>
@@ -15,37 +16,46 @@ namespace CrystalRush.Strategy
         /// </summary>
         private int AlternativeDigXLimit = 5;
 
+        /// <summary>Should the BOT prefer safe ore (un-dug). If false, the bot will pick the closest ore to grab</summary>
+        private readonly bool PreferSafeOre;
+
+        public DigOreStrategy(bool preferSafeOre)
+        {
+            PreferSafeOre = preferSafeOre;
+        }
+
+        //TODO: figure out safe ore logic
         public string GetMove(TileMap<CrystalRushCell> map, Robot robot)
         {
             var action = "WAIT";
 
             //Safe ore does not have a hole on it
-            var safeOre = map.FindNearest(tile => tile.Item.Ore > 0 && tile.Item.MyTrap == false && tile.Item.IsHole == false, robot.Position);
+            var safeOre = map.FindNearest(tile => tile.Item.Ore > 0 && tile.Item.IsTrap == false && tile.Item.IsHole == false, robot.Position);
+            var safeOreDistance = safeOre == null ? double.MaxValue : safeOre.Position.DistanceTo(robot.Position);
 
             //Find the closest ore 
-            var unsafeOre = map.FindNearest(tile => tile.Item.Ore > 0 && tile.Item.MyTrap == false, robot.Position);
+            var unsafeOre = map.FindNearest(tile => tile.Item.Ore > 0 && tile.Item.IsTrap == false, robot.Position);
+            var unsafeOreDistance = unsafeOre == null ? double.MaxValue : unsafeOre.Position.DistanceTo(robot.Position);
 
-            //Find an un-dug hole in my area
-            var alternative = map.FindNearest(tile => tile.Item.IsHole == false && tile.Position.X > AlternativeDigXLimit && tile.Item.MyTrap == false, robot.Position);
+            //Do a random dig because we cant see any ore
+            var alternative = map.FindNearest(tile => tile.Item.IsHole == false && tile.Position.X > AlternativeDigXLimit && tile.Item.IsTrap == false, robot.Position);
 
             //If we have ore, go to HQ
             if (robot.ItemHeld == CrystalRushItemType.Ore)
             {
-                action = $"MOVE 0 {robot.Position.Y} GO:HQ";
+                action = $"MOVE 0 {robot.Position.Y} d:hq";
             }
-            else if(safeOre != null)
+            else if (PreferSafeOre && safeOre != null)
             {
-                action = $"DIG {safeOre.Position.X} {safeOre.Position.Y} DIG:ORE-s";
+                action = $"DIG {safeOre.Position.X} {safeOre.Position.Y} d:s";
             }
-            //If we find ore dig it
             else if (unsafeOre != null)
             {
-                action = $"DIG {unsafeOre.Position.X} {unsafeOre.Position.Y} DIG:ORE-u";
+                action = $"DIG {unsafeOre.Position.X} {unsafeOre.Position.Y} d:u";
             }
-            //If we cant find ore, try digging a non-hole
-            else if (safeOre == null && unsafeOre == null && alternative != null)
+            else if(alternative != null)
             {
-                action = $"DIG {alternative.Position.X} {alternative.Position.Y} DIG:ALT";
+                action = $"DIG {alternative.Position.X} {alternative.Position.Y} d:a";
             }
 
             return action;

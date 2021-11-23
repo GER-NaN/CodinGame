@@ -44,21 +44,25 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BotStrategy\RadarClusterStrategy.cs" />
     <Compile Include="CrystalRushCell.cs" />
     <Compile Include="CrystalRushItem.cs" />
     <Compile Include="CrystalRushItemType.cs" />
-    <Compile Include="Strategy\IRobotStrategy.cs" />
+    <Compile Include="GameStrategy\TestStrategy.cs" />
+    <Compile Include="GameStrategy\TwoBotStrategy.cs" />
+    <Compile Include="GameStrategy\StarterStrategy.cs" />
+    <Compile Include="BotStrategy\IRobotStrategy.cs" />
     <Compile Include="Map.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Robot.cs" />
-    <Compile Include="Strategy\DeadStrategy.cs" />
-    <Compile Include="Strategy\NoStrategy.cs" />
-    <Compile Include="Strategy\RadarStrategy.cs" />
-    <Compile Include="Strategy\DigEmptyAreaStrategy.cs" />
-    <Compile Include="Strategy\DigOreStrategy.cs" />
-    <Compile Include="Strategy\TrapXStrategy.cs" />
-    <Compile Include="Strategy\TrapOreStrategy.cs" />
+    <Compile Include="BotStrategy\DeadStrategy.cs" />
+    <Compile Include="BotStrategy\NoStrategy.cs" />
+    <Compile Include="BotStrategy\RadarStrategy.cs" />
+    <Compile Include="BotStrategy\DigEmptyAreaStrategy.cs" />
+    <Compile Include="BotStrategy\DigOreStrategy.cs" />
+    <Compile Include="BotStrategy\TrapXStrategy.cs" />
+    <Compile Include="BotStrategy\TrapOreStrategy.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -69,6 +73,7 @@
       <Name>Common</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>C:\Source\Repos\SourceCombiner\SourceCombiner\SourceCombiner\bin\Debug\SourceCombiner.exe "C:\Source\Repos\CodinGame\CrystalRush\CrystalRush\CrystalRush.sln" c:\temp\crystal.txt true</PostBuildEvent>

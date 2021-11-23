@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Common.Core;
 using Common.TileMap;
 
-namespace CrystalRush.Strategy
+namespace CrystalRush.BotStrategy
 {
     //Searches an area and digs all Tiles that are not a hole
     public class DigEmptyAreaStrategy : IRobotStrategy

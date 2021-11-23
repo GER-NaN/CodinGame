@@ -5,13 +5,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CrystalRush.Strategy
+namespace CrystalRush.BotStrategy
 {
     public class NoStrategy : IRobotStrategy
     {
         public string GetMove(TileMap<CrystalRushCell> map, Robot robot)
         {
-            return "WAIT No Strategy";
+            return "WAIT w:ns";
         }
     }
 }

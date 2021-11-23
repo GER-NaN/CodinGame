@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CrystalRush.Strategy
+namespace CrystalRush.BotStrategy
 {
     public interface IRobotStrategy
     {

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CrystalRush.Strategy
+namespace CrystalRush.BotStrategy
 {
     public class TrapXStrategy : IRobotStrategy
     {
@@ -23,15 +23,15 @@ namespace CrystalRush.Strategy
             var action = "WAIT";
 
             //Find the closest safe ore 
-            var nearestOre = map.FindNearest(tile => tile.Item.Ore > 0 && tile.Item.IsHole == false && tile.Item.MyTrap == false, robot.Position);
+            var nearestOre = map.FindNearest(tile => tile.Item.Ore > 0 && tile.Item.IsHole == false && tile.Item.IsTrap == false, robot.Position);
 
             //Find somewhere to place my trap
-            var placeTrap = map.FindNearest(tile => tile.Item.MyTrap == false && tile.Position.X == XTrapLine, robot.Position);
+            var placeTrap = map.FindNearest(tile => tile.Item.IsTrap == false && tile.Position.X == XTrapLine, robot.Position);
 
             //If we cant place traps, convert to ore gathering
             if (placeTrap == null)
             {
-                var gatherOre = new DigOreStrategy();
+                var gatherOre = new DigOreStrategy(false);
                 return gatherOre.GetMove(map, robot);
             }
 
@@ -44,7 +44,7 @@ namespace CrystalRush.Strategy
             else if (robot.ItemHeld == CrystalRushItemType.Trap)
             {
                 action = $"DIG {robot.Position.X} { robot.Position.Y} BURY:TRAP";
-                map.TileAt(robot.Position).Item.MyTrap = true;
+                map.TileAt(robot.Position).Item.IsTrap = true;
             }
             //Request a trap at HQ
             else if (robot.AtHeadquarters() && robot.ItemHeld == CrystalRushItemType.None)

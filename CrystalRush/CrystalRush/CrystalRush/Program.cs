@@ -7,8 +7,9 @@ using System.Collections.Generic;
 using CrystalRush;
 using Common.TileMap;
 using Common.Core;
-using CrystalRush.Strategy;
+using CrystalRush.BotStrategy;
 using Common.StandardExtensions;
+using CrystalRush.GameStrategy;
 
 //https://www.codingame.com/ide/puzzle/crystal-rush
 class Program
@@ -53,7 +54,7 @@ class Program
                         //Need to reset everything
                         map.TileAt(j, i).Item.Ore = (ore == "?") ? 0 : int.Parse(ore);
                         map.TileAt(j, i).Item.IsHole = Convert.ToBoolean(hole);
-                        map.TileAt(j, i).Item.MyTrap = false;
+                        map.TileAt(j, i).Item.IsTrap = false;
                         map.TileAt(j, i).Item.IsRadar = false;
                     }
                 }
@@ -98,7 +99,7 @@ class Program
                 }
                 else if ((CrystalRushItemType)entityType == CrystalRushItemType.Trap)
                 {
-                    map.TileAt(x, y).Item.MyTrap = true;
+                    map.TileAt(x, y).Item.IsTrap = true;
                 }
             }
 
@@ -112,55 +113,19 @@ class Program
                 }
             }
 
-            //If we need a trapper, grab one of the diggers  
-            var startTrappingAt = 50;
-            var stopTrappingAt = 100;
-            var needTrapper = roundNumber.Between(startTrappingAt, stopTrappingAt);
+            //var test = new TestStrategy(map, myRobots, roundNumber);
+            //test.RunSingleStrategy(new RadarClusterStrategy());
 
-            if (needTrapper && !myRobots.Any(r => r.Strategy is TrapOreStrategy))
+            if (myRobots.Count(b => !b.IsDead()) >= 3)
             {
-                var robot = myRobots.Where(r => r.Strategy is DigOreStrategy || r.Strategy is NoStrategy).First();
-                robot.Strategy = new TrapOreStrategy();
+                var gameStrat = new StarterStrategy(map, myRobots, roundNumber,myScore,opponentScore);
+                gameStrat.RunStrategy();
             }
-            else if (!needTrapper && myRobots.Any(r => r.Strategy is TrapOreStrategy))//reset any trappers because we dont need them
+            else
             {
-                foreach (var bot in myRobots.Where(r => r.Strategy is TrapOreStrategy))
-                {
-                    bot.Strategy = new DigOreStrategy();
-                }
+                var gameStratLow = new TwoBotStrategy(map, myRobots, roundNumber);
+                gameStratLow.RunStrategy();
             }
-
-
-            //If we need radars, grab one of the diggers
-            var radarOreLimit = 20;
-            var needRadar = map.FindAll(cell => cell.Item.Ore > 0).Sum(cell => cell.Item.Ore) < radarOreLimit;
-
-            if (needRadar && !myRobots.Any(r => r.Strategy is RadarStrategy))
-            {
-                var robot = myRobots.Where(r => r.Strategy is DigOreStrategy || r.Strategy is NoStrategy).First();
-                robot.Strategy = new RadarStrategy();
-            }
-            else if (!needRadar && myRobots.Any(r => r.Strategy is RadarStrategy))//reset any radar because we dont need them
-            {
-                foreach (var bot in myRobots.Where(r => r.Strategy is RadarStrategy))
-                {
-                    bot.Strategy = new DigOreStrategy();
-                }
-            }
-
-
-            //Fix anyone without a strategy
-            foreach (var bot in myRobots.Where(r => r.Strategy is NoStrategy))
-            {
-                bot.Strategy = new DigOreStrategy();
-            }
-
-
-            foreach (var bot in myRobots)
-            {
-                Console.WriteLine(bot.Strategy.GetMove(map, bot));
-            }
-
         }
     }
 }

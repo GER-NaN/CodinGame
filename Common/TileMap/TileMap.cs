@@ -31,6 +31,15 @@ namespace Common.TileMap
             }
         }
 
+        /// <summary>Gets neighboring cells based on distance from the position</summary>
+        /// <param name="position">The position of the cell we want neighbors for</param>
+        /// <param name="level">How many levels should we extend out from the </param>
+        /// <returns></returns>
+        public List<Tile<T>> GetNeighbors(Point position, int level)
+        {
+            return this.Tiles.Where(t => t.Position.DistanceTo(position) <= level).ToList();
+        }
+
         public TileMap(T[,] map)
         {
             Width = map.GetLength(1);

@@ -1,6 +1,6 @@
 ﻿using Common.Core;
 using Common.TileMap;
-using CrystalRush.Strategy;
+using CrystalRush.BotStrategy;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
