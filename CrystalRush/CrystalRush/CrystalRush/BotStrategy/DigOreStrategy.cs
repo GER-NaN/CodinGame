@@ -34,11 +34,11 @@ namespace CrystalRush.BotStrategy
             var safeOreDistance = safeOre == null ? double.MaxValue : safeOre.Position.DistanceTo(robot.Position);
 
             //Find the closest ore 
-            var unsafeOre = map.FindNearest(tile => tile.Item.Ore > 0 && tile.Item.IsTrap == false, robot.Position);
+            var unsafeOre = map.FindNearest(tile => tile.Item.Ore > 0 && tile.Item.IsTrap == false && !tile.Item.Avoid, robot.Position);
             var unsafeOreDistance = unsafeOre == null ? double.MaxValue : unsafeOre.Position.DistanceTo(robot.Position);
 
             //Do a random dig because we cant see any ore
-            var alternative = map.FindNearest(tile => tile.Item.IsHole == false && tile.Position.X > AlternativeDigXLimit && tile.Item.IsTrap == false, robot.Position);
+            var alternative = map.FindNearest(tile => tile.Item.IsHole == false && tile.Position.X > AlternativeDigXLimit && tile.Item.IsTrap == false && !tile.Item.Avoid && !tile.Item.RadarCoverage, robot.Position);
 
             //If we have ore, go to HQ
             if (robot.ItemHeld == CrystalRushItemType.Ore)

@@ -42,16 +42,16 @@ namespace CrystalRush.BotStrategy
             GenerateClusterScores(map);
             GenerateRadarCoverage(map);
 
-            //Find the cell with best ore density score
+            //Find the cell with best surrounding ore density score
             var bestCell = map.Tiles.OrderByDescending(cell => cell.Item.ClusterDensityScore).First();
 
             //Find the a nearby spot not covered by radar
-            var newRadar = map.FindNearest(cell => !cell.Item.RadarCoverage && cell.Position.X > 0, bestCell.Position);
+            var newRadar = map.FindNearest(cell => !cell.Item.RadarCoverage && cell.Position.X > 0 && !cell.Item.Avoid, bestCell.Position);
 
             //Look for safe ore to grab
             var safeOre = map.FindNearest(tile => tile.Item.Ore > 0 && tile.Item.IsTrap == false && tile.Item.IsHole == false, robot.Position);
 
-            //Use a decent starting position if we have no radars ore we havent found ore
+            //Use a decent starting position if we have no radars or we havent found ore
             var startingRadar = map.TileAt(RadarStations.First(s => map.ItemAt(s).IsRadar == false && map.ItemAt(s).IsHole == false));
             var radarCount = map.Tiles.Where(tile => tile.Item.IsRadar).Count();
             var oreCount = map.Tiles.Where(tile => tile.Item.Ore > 0).Count();
@@ -61,8 +61,6 @@ namespace CrystalRush.BotStrategy
                 newRadar = startingRadar;
             }
 
-
-
             //If we have ore, go to HQ
             if (robot.ItemHeld == CrystalRushItemType.Ore)
             {
@@ -71,7 +69,7 @@ namespace CrystalRush.BotStrategy
             //If we have a radar, go place it
             else if (robot.ItemHeld == CrystalRushItemType.Radar)
             {
-                action = $"DIG {newRadar.Position.X} { newRadar.Position.Y} rc:d";
+                action = $"DIG {newRadar.Position.X} { newRadar.Position.Y} rc:dr";
                 if(robot.Position.Equals(newRadar.Position))
                 {
                     map.TileAt(newRadar.Position).Item.IsRadar = true;
@@ -85,7 +83,7 @@ namespace CrystalRush.BotStrategy
             //Dig safe ore if available
             else if (safeOre != null)
             {
-                action = $"DIG {safeOre.Position.X} {safeOre.Position.Y} rc:d";
+                action = $"DIG {safeOre.Position.X} {safeOre.Position.Y} rc:do";
             }
             //Go to HQ for another radar
             else if (safeOre == null)
@@ -115,6 +113,9 @@ namespace CrystalRush.BotStrategy
                 {
                     neighbor.Item.RadarCoverage = true;
                 }
+
+                //Mark the radar position as also having coverage
+                map.ItemAt(radar.Position).RadarCoverage = true;
             }
         }
     }

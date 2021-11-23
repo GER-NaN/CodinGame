@@ -23,15 +23,18 @@ class Program
 
 
         var myRobots = new List<Robot>();
+        var enemyRobots = new List<Robot>();
         var map = new TileMap<CrystalRushCell>(width, height);
         var roundNumber = 0;
+        TrapDetector trapDetector = null;
 
-        // game loop
         while (true)
         {
+
+            /*****************************************************************************
+             * Inputs
+             *****************************************************************************/
             roundNumber++;
-
-
             inputs = Console.ReadLine().Split(' ');
             int myScore = int.Parse(inputs[0]); // Amount of ore delivered
             int opponentScore = int.Parse(inputs[1]);
@@ -77,7 +80,6 @@ class Program
                 int y = int.Parse(inputs[3]); // position of the entity
                 int item = int.Parse(inputs[4]); // if this entity is a robot, the item it is carrying (-1 for NONE, 2 for RADAR, 3 for TRAP, 4 for ORE)
 
-                //Only handle my robots for now
                 if ((CrystalRushItemType)entityType == CrystalRushItemType.MyRobot)
                 {
                     var robot = new Robot(entityId, (CrystalRushItemType)entityType, new System.Drawing.Point(x, y));
@@ -93,6 +95,18 @@ class Program
                         myRobots.First(r => r.Id == robot.Id).Update(robot);
                     }
                 }
+                else if ((CrystalRushItemType)entityType == CrystalRushItemType.EnemyRobot)
+                {
+                    var robot = new Robot(entityId, (CrystalRushItemType)entityType, new System.Drawing.Point(x, y));
+                    if (roundNumber == 1)
+                    {
+                        enemyRobots.Add(robot);
+                    }
+                    else
+                    {
+                        enemyRobots.First(r => r.Id == robot.Id).Update(robot);
+                    }
+                }
                 else if ((CrystalRushItemType)entityType == CrystalRushItemType.Radar)
                 {
                     map.TileAt(x, y).Item.IsRadar = true;
@@ -103,6 +117,24 @@ class Program
                 }
             }
 
+
+            /*****************************************************************************
+             * Game Logic
+             *****************************************************************************/
+            if (trapDetector == null)
+            {
+                trapDetector = new TrapDetector(enemyRobots);
+            }
+            else
+            {
+                trapDetector.RunAnalysis(map,enemyRobots);
+            }
+
+            foreach(var trapPosition in trapDetector)
+            {
+                map.TileAt(trapPosition).Item.Avoid = true;
+                DebugTool.Print("Trap @", trapPosition);
+            }
 
             //Mark Dead robots
             foreach (var robot in myRobots)
@@ -118,7 +150,7 @@ class Program
 
             if (myRobots.Count(b => !b.IsDead()) >= 3)
             {
-                var gameStrat = new StarterStrategy(map, myRobots, roundNumber,myScore,opponentScore);
+                var gameStrat = new StarterStrategy(map, myRobots, roundNumber, myScore, opponentScore);
                 gameStrat.RunStrategy();
             }
             else

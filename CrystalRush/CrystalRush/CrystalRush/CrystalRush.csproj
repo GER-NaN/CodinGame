@@ -63,6 +63,7 @@
     <Compile Include="BotStrategy\DigOreStrategy.cs" />
     <Compile Include="BotStrategy\TrapXStrategy.cs" />
     <Compile Include="BotStrategy\TrapOreStrategy.cs" />
+    <Compile Include="TrapDetector.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

@@ -18,10 +18,10 @@ namespace CrystalRush.BotStrategy
             var freshOre = map.FindNearest(tile => tile.Item.Ore > 0 && !tile.Item.IsHole, robot.Position);
 
             //Find ore that does have a hole, this gets be blown up a bit
-            var usedOre = map.FindNearest(tile => tile.Item.Ore > 0 && tile.Item.IsHole && !tile.Item.IsTrap, robot.Position);
+            var usedOre = map.FindNearest(tile => tile.Item.Ore > 0 && tile.Item.IsHole && !tile.Item.IsTrap && !tile.Item.Avoid, robot.Position);
 
             //Empty spot near HQ
-            var empty = map.FindNearest(tile => tile.Item.Ore == 0 && !tile.Item.IsHole && !tile.Item.IsTrap && tile.Position.X < 5 && tile.Position.X > 0, robot.Position);
+            var empty = map.FindNearest(tile => tile.Item.Ore == 0 && !tile.Item.IsHole && !tile.Item.IsTrap && tile.Position.X < 5 && tile.Position.X > 0 && !tile.Item.Avoid, robot.Position);
 
             //If we have a trap, place it on fresh ore
             if(robot.ItemHeld == CrystalRushItemType.Trap && freshOre != null)

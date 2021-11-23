@@ -1,6 +1,7 @@
 ﻿using Common.Core;
 using Common.StandardTypeExtensions;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -8,7 +9,7 @@ using System.Text;
 
 namespace Common.TileMap
 {
-    public class TileMap<T>
+    public class TileMap<T> : IEnumerable<Tile<T>>
     {
         private Random random = new Random(Guid.NewGuid().GetHashCode());
 
@@ -37,7 +38,17 @@ namespace Common.TileMap
         /// <returns></returns>
         public List<Tile<T>> GetNeighbors(Point position, int level)
         {
-            return this.Tiles.Where(t => t.Position.DistanceTo(position) <= level).ToList();
+            return this.Tiles.Where(t => t.Position.DistanceTo(position) <= level && t.Position != position).ToList();
+        }
+
+        /// <summary>Gets neighboring cells based on distance from the position and the predicate condition</summary>
+        /// <param name="position">The position of the cell we want neighbors for</param>
+        /// <param name="level">How many levels should we extend out from the </param>
+        /// <param name="predicate">The predicate condition to also match neighbors on</param>
+        /// <returns></returns>
+        public List<Tile<T>> GetNeighbors(Point position, int level, Func<Tile<T>, bool> predicate)
+        {
+            return this.Tiles.Where(predicate).Where(t => t.Position.DistanceTo(position) <= level && t.Position != position).ToList();
         }
 
         public TileMap(T[,] map)
@@ -190,6 +201,16 @@ namespace Common.TileMap
             var y = random.Next() % Height;
 
             return this.TileAt(x, y);
+        }
+
+        public IEnumerator<Tile<T>> GetEnumerator()
+        {
+            return Tiles.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
     }
 }

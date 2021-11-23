@@ -13,6 +13,7 @@ namespace CrystalRush
         public bool IsHole = false;
         public bool IsRadar = false;
         public bool IsTrap = false;
+        public bool Avoid = false;
 
         //Strategy flags
         
