@@ -30,7 +30,7 @@ class Program
 
         while (true)
         {
-
+            DebugTool.StartTimer("Global");
             /*****************************************************************************
              * Inputs
              *****************************************************************************/
@@ -48,20 +48,30 @@ class Program
                     string ore = inputs[2 * j];// amount of ore or "?" if unknown
                     int hole = int.Parse(inputs[2 * j + 1]);// 1 if cell has a hole
 
-                    if (map.TileAt(j, i).Item == null)
+                    var tile = map.TileAt(j,i);
+                    if (tile.Item == null)
                     {
-                        map.TileAt(j, i).Item = new CrystalRushCell(ore, hole);
+                        tile.Item = new CrystalRushCell(ore, hole);
                     }
                     else
                     {
                         //Need to reset everything
-                        map.TileAt(j, i).Item.Ore = (ore == "?") ? 0 : int.Parse(ore);
-                        map.TileAt(j, i).Item.IsHole = Convert.ToBoolean(hole);
-                        map.TileAt(j, i).Item.IsTrap = false;
-                        map.TileAt(j, i).Item.IsRadar = false;
+                        tile.Item.Ore = (ore == "?") ? 0 : int.Parse(ore);
+                        tile.Item.IsHole = Convert.ToBoolean(hole);
+                        tile.Item.IsTrap = false;
+                        tile.Item.IsRadar = false;
+                        tile.Item.BotsAssignedToDig = 0;
+
+                        //Update our original ore map
+                        //if (map.TileAt(j,i).Item.Ore > 0 && originalOreMap.TileAt(j,i).Item == 0)
+                        //{
+                        //    originalOreMap.TileAt(j, i).Item = map.TileAt(j, i).Item.Ore;
+                        //}
                     }
                 }
             }
+
+            DebugTool.CheckTimer("Global", "Process Cells");
 
             inputs = Console.ReadLine().Split(' ');
             int entityCount = int.Parse(inputs[0]); // number of entities visible to you
@@ -116,7 +126,7 @@ class Program
                     map.TileAt(x, y).Item.IsTrap = true;
                 }
             }
-
+            DebugTool.CheckTimer("Global", "Process Entities");
 
             /*****************************************************************************
              * Game Logic
@@ -134,6 +144,7 @@ class Program
             {
                 map.TileAt(trapPosition).Item.Avoid = true;
             }
+            DebugTool.CheckTimer("Global", "Process Traps");
 
             //Mark Dead robots
             foreach (var robot in myRobots)
@@ -146,17 +157,20 @@ class Program
 
             //var test = new TestStrategy(map, myRobots, roundNumber);
             //test.RunSingleStrategy(new RadarClusterStrategy());
-
+            DebugTool.CheckTimer("Global", "Process Dead Bots");
             if (myRobots.Count(b => !b.IsDead()) >= 3)
             {
                 var gameStrat = new StarterStrategy(map, myRobots, roundNumber, myScore, opponentScore);
                 gameStrat.RunStrategy();
+                DebugTool.CheckTimer("Global", "Run Strategy");
             }
             else
             {
                 var gameStratLow = new TwoBotStrategy(map, myRobots, roundNumber);
                 gameStratLow.RunStrategy();
             }
+
+            DebugTool.StopTimer("Global");
         }
     }
 }

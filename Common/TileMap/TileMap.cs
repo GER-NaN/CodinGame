@@ -9,9 +9,10 @@ using System.Text;
 
 namespace Common.TileMap
 {
-    public class TileMap<T> : IEnumerable<Tile<T>>
+    public class TileMap<T>
     {
         private Random random = new Random(Guid.NewGuid().GetHashCode());
+        private readonly Tile<T>[,] LookupArray;
 
         public List<Tile<T>> Tiles;
         public readonly int Width;
@@ -23,11 +24,29 @@ namespace Common.TileMap
             Height = height;
 
             Tiles = new List<Tile<T>>(Width * Height);
+            LookupArray = new Tile<T>[Height, Width];
+
             for (int i = 0; i < Height; i++)//Height (Y)
             {
                 for (int j = 0; j < Width; j++)//Width (X)
                 {
-                    Tiles.Add(new Tile<T>(new Point(j, i)));
+                    var t = new Tile<T>(new Point(j, i));
+                    Tiles.Add(t);
+                    LookupArray[i,j] = t;
+                }
+            }
+        }
+
+        public TileMap(T[,] map)
+        {
+            Width = map.GetLength(1);
+            Height = map.GetLength(0);
+
+            for (int i = 0; i < Height; i++)//Height (Y)
+            {
+                for (int j = 0; j < Width; j++)//Width (X)
+                {
+                    LookupArray[i, j] = new Tile<T>(new Point(j, i), map[i, j]);
                 }
             }
         }
@@ -38,7 +57,20 @@ namespace Common.TileMap
         /// <returns></returns>
         public List<Tile<T>> GetNeighbors(Point position, int level)
         {
-            return this.Tiles.Where(t => t.Position.DistanceTo(position) <= level && t.Position != position).ToList();
+            List<Tile<T>> tiles = new List<Tile<T>>();
+            for (int i = 0; i < Height; i++)//Height (Y)
+            {
+                for (int j = 0; j < Width; j++)//Width (X)
+                {
+                    var tile = LookupArray[i, j];
+                    if (tile.Position.DistanceTo(position) <= level && tile.Position != position)
+                    {
+                        tiles.Add(tile);
+                    }
+                }
+            }
+            return tiles;
+            //return this.Tiles.Where(t => t.Position.DistanceTo(position) <= level && t.Position != position).ToList();
         }
 
         /// <summary>Gets neighboring cells based on distance from the position and the predicate condition</summary>
@@ -48,23 +80,20 @@ namespace Common.TileMap
         /// <returns></returns>
         public List<Tile<T>> GetNeighbors(Point position, int level, Func<Tile<T>, bool> predicate)
         {
-            return this.Tiles.Where(predicate).Where(t => t.Position.DistanceTo(position) <= level && t.Position != position).ToList();
-        }
-
-        public TileMap(T[,] map)
-        {
-            Width = map.GetLength(1);
-            Height = map.GetLength(0);
-
-            Tiles = new List<Tile<T>>(Width * Height);
+            List<Tile<T>> tiles = new List<Tile<T>>();
             for (int i = 0; i < Height; i++)//Height (Y)
             {
                 for (int j = 0; j < Width; j++)//Width (X)
                 {
-                    //A lil' confusing here.... Points are in formatted in X,Y style. Array access is Y,X style, ie. Row,Column. Thats why they are flipped when reading the item from the Array
-                    Tiles.Add(new Tile<T>(new Point(j, i),map[i,j]));
+                    var tile = LookupArray[i, j];
+                    if (tile.Position.DistanceTo(position) <= level && tile.Position != position && predicate.Invoke(tile) )
+                    {
+                        tiles.Add(tile);
+                    }
                 }
             }
+            return tiles;
+            //return this.Tiles.Where(predicate).Where(t => t.Position.DistanceTo(position) <= level && t.Position != position).ToList();
         }
 
         /// <summary>Finds all tiles with the item in it.</summary>
@@ -72,14 +101,39 @@ namespace Common.TileMap
         /// <returns>All tiles that contain the item specified</returns>
         public List<Tile<T>> FindAll(T item)
         {
-            return Tiles.Where(t => t.Item.Equals(item)).ToList();
+            List<Tile<T>> tiles = new List<Tile<T>>();
+            for (int i = 0; i < Height; i++)//Height (Y)
+            {
+                for (int j = 0; j < Width; j++)//Width (X)
+                {
+                    var tile = LookupArray[i, j];
+                    if (tile.Item.Equals(item))
+                    {
+                        tiles.Add(tile);
+                    }
+                }
+            }
+            return tiles;
+            //return Tiles.Where(t => t.Item.Equals(item)).ToList();
         }
 
         /// <summary>Finds a tile with the item in it. If multiple Tiles contain the requested item the Tile returned is arbitrary and is not guaranteed to be the same every call.</summary>
         /// <param name="item">The item to look for in the Tiles</param>
         public Tile<T> Find(T item)
         {
-            return Tiles.FirstOrDefault(t => t.Item.Equals(item));
+            for (int i = 0; i < Height; i++)//Height (Y)
+            {
+                for (int j = 0; j < Width; j++)//Width (X)
+                {
+                    var tile = LookupArray[i, j];
+                    if (tile.Item.Equals(item))
+                    {
+                        return (tile);
+                    }
+                }
+            }
+            return null;
+            //return Tiles.FirstOrDefault(t => t.Item.Equals(item));
         }
 
         /// <summary> Finds the first tile that matches the predicate condition</summary>
@@ -87,7 +141,18 @@ namespace Common.TileMap
         /// <returns></returns>
         public Tile<T> Find(Func<Tile<T>,bool> predicate)
         {
-            return Tiles.FirstOrDefault(predicate);
+            for (int i = 0; i < Height; i++)//Height (Y)
+            {
+                for (int j = 0; j < Width; j++)//Width (X)
+                {
+                    var tile = LookupArray[i, j];
+                    if (predicate.Invoke(tile))
+                    {
+                        return tile;
+                    }
+                }
+            }
+            return null;
         }
 
         /// <summary> Finds all tiles that matche the predicate condition</summary>
@@ -95,7 +160,20 @@ namespace Common.TileMap
         /// <returns></returns>
         public List<Tile<T>> FindAll(Func<Tile<T>, bool> predicate)
         {
-            return Tiles.Where(predicate).ToList();
+            var tiles = new List<Tile<T>>();
+            for (int i = 0; i < Height; i++)//Height (Y)
+            {
+                for (int j = 0; j < Width; j++)//Width (X)
+                {
+                    var tile = LookupArray[i, j];
+                    if (predicate.Invoke(tile))
+                    {
+                        tiles.Add(tile);
+                    }
+                }
+            }
+            return tiles;
+            //return Tiles.Where(predicate).ToList();
         }
 
         /// <summary> Finds the first tile that matches the predicate condition</summary>
@@ -104,16 +182,35 @@ namespace Common.TileMap
         /// <returns></returns>
         public Tile<T> FindNearest(Func<Tile<T>, bool> predicate, Point p)
         {
-            var tiles = Tiles.Where(predicate);
-            return tiles.OrderBy(tile => p.DistanceTo(tile.Position)).FirstOrDefault();
+            Tile<T> nearest = null;
+            double nearestDistance = double.MaxValue;
 
+            for (int i = 0; i < Height; i++)//Height (Y)
+            {
+                for (int j = 0; j < Width; j++)//Width (X)
+                {
+                    var tile = LookupArray[i, j];
+                    if (predicate.Invoke(tile))
+                    {
+                        if(p.DistanceTo(tile.Position) < nearestDistance)
+                        {
+                            nearestDistance = p.DistanceTo(tile.Position);
+                            nearest = tile;
+                        }
+                    }
+                }
+            }
+            return nearest;
+            //var tiles = Tiles.Where(predicate);
+            //return tiles.OrderBy(tile => p.DistanceTo(tile.Position)).FirstOrDefault();
         }
 
 
         /// <summary>Gets the tile at the specified x y coordinates</summary>
         public Tile<T> TileAt(int x, int y)
         {
-            return Tiles.FirstOrDefault(t => t.Position.X == x && t.Position.Y == y);
+            return LookupArray[y, x];
+            //return Tiles.FirstOrDefault(t => t.Position.X == x && t.Position.Y == y);
         }
 
         /// <summary>Gets the tile at the Point</summary>
@@ -201,16 +298,6 @@ namespace Common.TileMap
             var y = random.Next() % Height;
 
             return this.TileAt(x, y);
-        }
-
-        public IEnumerator<Tile<T>> GetEnumerator()
-        {
-            return Tiles.GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
         }
     }
 }

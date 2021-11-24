@@ -32,5 +32,17 @@ namespace Common.TileMap
         {
             return $"({Position.X},{Position.Y}) > {Item}";
         }
+
+        public override bool Equals(object obj)
+        {
+            var t1 = obj as Tile<T>;
+            return (t1.Position.X == this.Position.X && t1.Position.Y == this.Position.Y);
+        }
+
+        //https://stackoverflow.com/a/4630550
+        public override int GetHashCode()
+        {
+            return new { this.Position.X, this.Position.Y }.GetHashCode();
+        }
     }
 }

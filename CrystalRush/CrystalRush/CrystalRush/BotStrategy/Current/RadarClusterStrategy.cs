@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Common.Core;
 using Common.TileMap;
 
 namespace CrystalRush.BotStrategy
@@ -35,8 +36,21 @@ namespace CrystalRush.BotStrategy
             new Point(7,0)
         };
 
+        /// <summary>A map of the original ore counts as Ore gets discovered</summary>
+        //private readonly TileMap<int> OriginalOreMap;
+
+        /// <summary> The current full map</summary>
+        private readonly TileMap<CrystalRushCell> Map;
+
+        public RadarClusterStrategy(TileMap<CrystalRushCell> map)
+        {
+            //OriginalOreMap = originalOreMap;
+            Map = map;
+        }
+
         public string GetMove(TileMap<CrystalRushCell> map, Robot robot)
         {
+            DebugTool.StartTimer("Radar");
             var action = "WAIT";
 
             GenerateClusterScores(map);
@@ -49,7 +63,7 @@ namespace CrystalRush.BotStrategy
             var newRadar = map.FindNearest(cell => !cell.Item.RadarCoverage && cell.Position.X > 0 && !cell.Item.Avoid, bestCell.Position);
 
             //Look for safe ore to grab
-            var safeOre = map.FindNearest(tile => tile.Item.Ore > 0 && tile.Item.IsTrap == false && tile.Item.IsHole == false, robot.Position);
+            var safeOre = map.FindNearest(tile => tile.Item.SafeOreAvailable(false), robot.Position);
 
             //Use a decent starting position if we have no radars or we havent found ore
             var startingRadar = map.TileAt(RadarStations.First(s => map.ItemAt(s).IsRadar == false && map.ItemAt(s).IsHole == false));
@@ -84,6 +98,7 @@ namespace CrystalRush.BotStrategy
             else if (safeOre != null)
             {
                 action = $"DIG {safeOre.Position.X} {safeOre.Position.Y} rc:do";
+                safeOre.Item.BotsAssignedToDig += 1;
             }
             //Go to HQ for another radar
             else if (safeOre == null)
@@ -91,21 +106,29 @@ namespace CrystalRush.BotStrategy
                 action = $"MOVE 0 {robot.Position.Y} rc:hq";
             }
 
+            DebugTool.StopTimer("Radar");
             return action;
         }
 
         private void GenerateClusterScores(TileMap<CrystalRushCell> map)
         {
-            foreach (var cell in map.Tiles)
+            //Calculate clusters using the original Ore counts
+            foreach (var cell in Map.Tiles)
             {
-                var neighbors = map.GetNeighbors(cell.Position, 2);
+                var neighbors = Map.GetNeighbors(cell.Position, 2);
                 var score = neighbors.Sum(neighbor => neighbor.Item.Ore) + cell.Item.Ore;
-                cell.Item.ClusterDensityScore = score;
+                map.ItemAt(cell.Position).ClusterDensityScore = score;
             }
         }
 
         private void GenerateRadarCoverage(TileMap<CrystalRushCell> map)
         {
+            //Clear Radar coverage
+            foreach(var cell in map.Tiles)
+            {
+                cell.Item.RadarCoverage = false;
+            }
+
             foreach (var radar in map.FindAll(t => t.Item.IsRadar))
             {
                 var neighbors = map.GetNeighbors(radar.Position, 4);

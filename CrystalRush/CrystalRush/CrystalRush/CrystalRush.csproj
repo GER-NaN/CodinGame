@@ -44,25 +44,25 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BotStrategy\RadarClusterStrategy.cs" />
+    <Compile Include="BotStrategy\Current\RadarClusterStrategy.cs" />
     <Compile Include="CrystalRushCell.cs" />
     <Compile Include="CrystalRushItem.cs" />
     <Compile Include="CrystalRushItemType.cs" />
     <Compile Include="GameStrategy\TestStrategy.cs" />
     <Compile Include="GameStrategy\TwoBotStrategy.cs" />
     <Compile Include="GameStrategy\StarterStrategy.cs" />
-    <Compile Include="BotStrategy\IRobotStrategy.cs" />
+    <Compile Include="BotStrategy\Current\IRobotStrategy.cs" />
     <Compile Include="Map.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Robot.cs" />
-    <Compile Include="BotStrategy\DeadStrategy.cs" />
-    <Compile Include="BotStrategy\NoStrategy.cs" />
-    <Compile Include="BotStrategy\RadarStrategy.cs" />
-    <Compile Include="BotStrategy\DigEmptyAreaStrategy.cs" />
-    <Compile Include="BotStrategy\DigOreStrategy.cs" />
-    <Compile Include="BotStrategy\TrapXStrategy.cs" />
-    <Compile Include="BotStrategy\TrapOreStrategy.cs" />
+    <Compile Include="BotStrategy\Current\DeadStrategy.cs" />
+    <Compile Include="BotStrategy\Current\NoStrategy.cs" />
+    <Compile Include="BotStrategy\Experimental\RadarStrategy.cs" />
+    <Compile Include="BotStrategy\Experimental\DigEmptyAreaStrategy.cs" />
+    <Compile Include="BotStrategy\Current\DigOreStrategy.cs" />
+    <Compile Include="BotStrategy\Experimental\TrapXStrategy.cs" />
+    <Compile Include="BotStrategy\Current\TrapOreStrategy.cs" />
     <Compile Include="TrapDetector.cs" />
   </ItemGroup>
   <ItemGroup>

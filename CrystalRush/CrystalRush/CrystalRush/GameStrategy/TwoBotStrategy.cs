@@ -30,7 +30,7 @@ namespace CrystalRush.GameStrategy
             if (oreIsLow && !Bots.Any(r => r.Strategy is RadarClusterStrategy))
             {
                 var robot = Bots.First();
-                robot.Strategy = new RadarClusterStrategy();
+                robot.Strategy = new RadarClusterStrategy(Map);
             }
             //Ore is not low, everyone should be digging
             else if (!oreIsLow)

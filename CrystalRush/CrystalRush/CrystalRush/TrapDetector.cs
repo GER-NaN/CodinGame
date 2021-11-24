@@ -47,7 +47,7 @@ namespace CrystalRush
                 else if (placedItem && BotsCurrentlyTracking.Contains(bot.Id))
                 {
                     //Bots dont always place an item on their position, they can place items adjacent (up/down/left,right) as well.
-                    var newHoles = map.Where(cell => cell.Item.IsHole && !ExistingHoles.Contains(cell.Position));
+                    var newHoles = map.FindAll(cell => cell.Item.IsHole && !ExistingHoles.Contains(cell.Position));
 
                     //If there is a new hole within 1 distance of the bot, consider that the trap
                     if(newHoles.Any(newHole => newHole.Position.DistanceTo(bot.Position) <= 1))
@@ -81,12 +81,11 @@ namespace CrystalRush
             }
 
             //Update hole locations
-            foreach(var tile in map)
+            var holesToAdd = map.FindAll(t => t.Item.IsHole);
+
+            foreach(var hole in holesToAdd)
             {
-                if(tile.Item.IsHole)
-                {
-                    ExistingHoles.Add(tile.Position);
-                }
+                ExistingHoles.Add(hole.Position);
             }
         }
 

@@ -1,7 +1,9 @@
-﻿using Common.StandardTypeExtensions;
+﻿using Common.Core;
+using Common.StandardTypeExtensions;
 using Common.TileMap;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -30,16 +32,17 @@ namespace CrystalRush.BotStrategy
             var action = "WAIT";
 
             //Safe ore does not have a hole on it
-            var safeOre = map.FindNearest(tile => tile.Item.Ore > 0 && tile.Item.IsTrap == false && tile.Item.IsHole == false, robot.Position);
+            var safeOre = map.FindNearest(tile => tile.Item.SafeOreAvailable(false), robot.Position);
             var safeOreDistance = safeOre == null ? double.MaxValue : safeOre.Position.DistanceTo(robot.Position);
 
             //Find the closest ore 
-            var unsafeOre = map.FindNearest(tile => tile.Item.Ore > 0 && tile.Item.IsTrap == false && !tile.Item.Avoid, robot.Position);
+            var unsafeOre = map.FindNearest(tile => tile.Item.SafeOreAvailable(true), robot.Position);
             var unsafeOreDistance = unsafeOre == null ? double.MaxValue : unsafeOre.Position.DistanceTo(robot.Position);
 
             //Do a random dig because we cant see any ore
-            var alternative = map.FindNearest(tile => tile.Item.IsHole == false && tile.Position.X > AlternativeDigXLimit && tile.Item.IsTrap == false && !tile.Item.Avoid && !tile.Item.RadarCoverage, robot.Position);
+            var alternative = map.FindNearest(tile => tile.Position.X > AlternativeDigXLimit && !tile.Item.RadarCoverage && tile.Item.SafeToDig(), robot.Position);
 
+            DebugTool.Print("DIG - Begin If");
             //If we have ore, go to HQ
             if (robot.ItemHeld == CrystalRushItemType.Ore)
             {
@@ -48,14 +51,17 @@ namespace CrystalRush.BotStrategy
             else if (PreferSafeOre && safeOre != null)
             {
                 action = $"DIG {safeOre.Position.X} {safeOre.Position.Y} d:s";
+                safeOre.Item.BotsAssignedToDig += 1;
             }
             else if (unsafeOre != null)
             {
                 action = $"DIG {unsafeOre.Position.X} {unsafeOre.Position.Y} d:u";
+                unsafeOre.Item.BotsAssignedToDig += 1;
             }
             else if(alternative != null)
             {
                 action = $"DIG {alternative.Position.X} {alternative.Position.Y} d:a";
+                alternative.Item.BotsAssignedToDig += 1;
             }
 
             return action;
