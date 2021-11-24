@@ -72,7 +72,7 @@ namespace Common.Core
         {
             if (Timers.ContainsKey(name))
             {
-                DebugTool.Print($"Timer {name} {label}: {Timers[name].ElapsedMilliseconds}ms");
+                DebugTool.Print($"Timer {name} ({label}): {Timers[name].ElapsedMilliseconds}ms");
             }
         }
     }

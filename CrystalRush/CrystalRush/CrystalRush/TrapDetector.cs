@@ -46,29 +46,21 @@ namespace CrystalRush
                 }
                 else if (placedItem && BotsCurrentlyTracking.Contains(bot.Id))
                 {
-                    //Bots dont always place an item on their position, they can place items adjacent (up/down/left,right) as well.
-                    var newHoles = map.FindAll(cell => cell.Item.IsHole && !ExistingHoles.Contains(cell.Position));
 
-                    //If there is a new hole within 1 distance of the bot, consider that the trap
-                    if(newHoles.Any(newHole => newHole.Position.DistanceTo(bot.Position) <= 1))
+                    //New holes are highly suspect
+                    var newHoles = map.FindAll(cell => cell.Item.IsHole && cell.Position.DistanceTo(bot.Position) <= 1 && !ExistingHoles.Contains(cell.Position));
+                    foreach(var cell in newHoles)
                     {
-                        Traps.Add(newHoles.First(newHole => newHole.Position.DistanceTo(bot.Position) <= 1).Position);
-                    }
-                    else
-                    {
-                        var adjacentHoles = map.GetNeighbors(bot.Position, 1,tile => tile.Item.IsHole);
-                        foreach(var hole in adjacentHoles)
-                        {
-                            Traps.Add(hole.Position);
-                        }
-
-                        //Check the bots position
-                        if(map.TileAt(bot.Position).Item.IsHole)
-                        {
-                            Traps.Add(bot.Position);
-                        }
+                        Traps.Add(cell.Position);
                     }
 
+                    //Also mark adjacent holes
+                    var adjacentHoles = map.GetNeighbors(bot.Position, 1,tile => tile.Item.IsHole);
+                    foreach(var hole in adjacentHoles)
+                    {
+                        Traps.Add(hole.Position);
+                    }
+                    
                     //Remove the bot from our tracking list
                     BotsCurrentlyTracking.Remove(bot.Id);
                 }

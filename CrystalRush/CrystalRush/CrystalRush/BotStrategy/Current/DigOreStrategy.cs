@@ -42,7 +42,6 @@ namespace CrystalRush.BotStrategy
             //Do a random dig because we cant see any ore
             var alternative = map.FindNearest(tile => tile.Position.X > AlternativeDigXLimit && !tile.Item.RadarCoverage && tile.Item.SafeToDig(), robot.Position);
 
-            DebugTool.Print("DIG - Begin If");
             //If we have ore, go to HQ
             if (robot.ItemHeld == CrystalRushItemType.Ore)
             {

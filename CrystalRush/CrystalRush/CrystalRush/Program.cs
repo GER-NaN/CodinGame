@@ -71,7 +71,6 @@ class Program
                 }
             }
 
-            DebugTool.CheckTimer("Global", "Process Cells");
 
             inputs = Console.ReadLine().Split(' ');
             int entityCount = int.Parse(inputs[0]); // number of entities visible to you
@@ -126,7 +125,6 @@ class Program
                     map.TileAt(x, y).Item.IsTrap = true;
                 }
             }
-            DebugTool.CheckTimer("Global", "Process Entities");
 
             /*****************************************************************************
              * Game Logic
@@ -143,8 +141,8 @@ class Program
             foreach(var trapPosition in trapDetector)
             {
                 map.TileAt(trapPosition).Item.Avoid = true;
+                DebugTool.Print("Trap @" + trapPosition);
             }
-            DebugTool.CheckTimer("Global", "Process Traps");
 
             //Mark Dead robots
             foreach (var robot in myRobots)
@@ -156,8 +154,9 @@ class Program
             }
 
             //var test = new TestStrategy(map, myRobots, roundNumber);
-            //test.RunSingleStrategy(new RadarClusterStrategy());
-            DebugTool.CheckTimer("Global", "Process Dead Bots");
+            //test.RunSingleStrategy(new NoStrategy());
+
+
             if (myRobots.Count(b => !b.IsDead()) >= 3)
             {
                 var gameStrat = new StarterStrategy(map, myRobots, roundNumber, myScore, opponentScore);

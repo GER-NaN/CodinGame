@@ -24,7 +24,7 @@ namespace CrystalRush.GameStrategy
         public void RunStrategy()
         {
             //If we need radars, assign it to someone
-            var radarOreLimit = 20;
+            var radarOreLimit = 10;
             var oreIsLow = Map.FindAll(cell => cell.Item.Ore > 0).Sum(cell => cell.Item.Ore) < radarOreLimit;
 
             if (oreIsLow && !Bots.Any(r => r.Strategy is RadarClusterStrategy))
