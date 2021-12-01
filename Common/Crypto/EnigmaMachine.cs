@@ -17,7 +17,7 @@ namespace Common.Crypto
         private readonly char[] Rotor1;
         private readonly char[] Rotor2;
         private readonly char[] Rotor3;
-         
+
         public EnigmaMachine(string message, int startingShift, string rotor1, string rotor2, string rotor3)
         {
             Message = message;
@@ -32,13 +32,13 @@ namespace Common.Crypto
             //Start by Caesar Shift each character using an incrementing number
             var encodedMessage = Message.ToCharArray();
 
-            for(int i=0;i<encodedMessage.Length;i++)
+            for (int i = 0; i < encodedMessage.Length; i++)
             {
                 encodedMessage[i] = CaesarCipher.Encode(encodedMessage[i].ToString(), StartingShift + i, Alphabet.Uppers)[0];
             }
 
             //Rotor1
-            for(int i =0;i<encodedMessage.Length;i++)
+            for (int i = 0; i < encodedMessage.Length; i++)
             {
                 encodedMessage[i] = Rotor1[Array.IndexOf(Alphabet.Uppers, encodedMessage[i])];
             }
@@ -64,7 +64,7 @@ namespace Common.Crypto
             var decodedMessage = Message.ToCharArray();
 
             //Start by Decoding Rotor3 
-            for(int i = 0; i< decodedMessage.Length; i++)
+            for (int i = 0; i < decodedMessage.Length; i++)
             {
                 decodedMessage[i] = Alphabet.Uppers[Array.IndexOf(Rotor3, decodedMessage[i])];
             }

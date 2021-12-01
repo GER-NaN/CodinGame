@@ -136,6 +136,11 @@ class Program
             else
             {
                 trapDetector.RunAnalysis(map,enemyRobots);
+
+                foreach(var trap in trapDetector)
+                {
+                    map.ItemAt(trap).Avoid = true;
+                }
             }
 
             //Clear and reset Radar coverage
@@ -166,7 +171,7 @@ class Program
             }
 
             //var test = new TestStrategy(map, myRobots, roundNumber);
-            //test.RunSingleStrategy(new RadarFillStrategy());
+            //test.RunSingleStrategy(new NoStrategy());
 
 
             if (myRobots.Count(b => !b.IsDead()) >= 3)

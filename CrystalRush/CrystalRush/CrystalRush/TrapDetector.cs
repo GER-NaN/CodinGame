@@ -43,6 +43,7 @@ namespace CrystalRush
                 if (pickedUp)
                 {
                     BotsCurrentlyTracking.Add(bot.Id);
+                    DebugTool.Print(bot.Id, "picked up", " ");
                 }
                 else if (placedItem && BotsCurrentlyTracking.Contains(bot.Id))
                 {
@@ -52,6 +53,7 @@ namespace CrystalRush
                     foreach(var cell in newHoles)
                     {
                         Traps.Add(cell.Position);
+                        DebugTool.Print("Trap @", cell.Position, " ");
                     }
 
                     //Also mark adjacent holes
@@ -59,6 +61,7 @@ namespace CrystalRush
                     foreach(var hole in adjacentHoles)
                     {
                         Traps.Add(hole.Position);
+                        DebugTool.Print("Trap @", hole.Position, " ");
                     }
                     
                     //Remove the bot from our tracking list

@@ -13,8 +13,6 @@ namespace CommonTests.Crypto
         /// <summary>An array of Uppercase characters </summary>
         public static readonly char[] Uppers = new char[] { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z' };
 
-        public static readonly Random Random = new Random();
-
         [TestMethod]
         public void TestTextNotInAlphabet()
         {
@@ -80,7 +78,7 @@ namespace CommonTests.Crypto
             for(int shift = 0;shift < 100;shift ++)
             {
                 //Generate a random plaintext
-                var plaintext = GenerateRandomString(Lowers);
+                var plaintext = TestUtilities.GenerateRandomString(Lowers);
 
                 //Generate cipher by shifting
                 var cipher = CaesarCipher.Encode(plaintext, shift, Lowers);
@@ -108,22 +106,6 @@ namespace CommonTests.Crypto
             //Only some of the characters in the plaintext wrap around
             Assert.AreEqual("YZA", CaesarCipher.Encode("ABC", 24, alphabet),"Wrap around failed, only C should wrap around and become A");
             Assert.AreEqual("ZAB", CaesarCipher.Encode("XYZ", -24, alphabet), "Wrap around failed, only X should wrap around and become Z");
-        }
-
-
-
-        /// <summary> Generates a random string from the given alphabet</summary>
-        private string GenerateRandomString(char[] alphabet)
-        {
-            var stringLength = Random.Next(1,20);
-            var randomString = "";
-
-            for(int i = 0;i<stringLength;i++)
-            {
-                randomString += alphabet[Random.Next(0, alphabet.Length)];
-            }
-
-            return randomString;
         }
     }
 }

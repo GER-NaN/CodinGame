@@ -62,13 +62,13 @@ namespace CrystalRush.BotStrategy
 
                     foreach (var neighbor in neighbors)
                     {
-                        if(!neighbor.Item.RadarCoverage)
+                        if(!neighbor.Item.RadarCoverage && neighbor.Item.SafeToDig())
                         {
                             newCoverage += 1;
                         }
                     }
                     //Count the radars location as well
-                    if(!tile.Item.RadarCoverage)
+                    if(!tile.Item.RadarCoverage && tile.Item.SafeToDig())
                     {
                         newCoverage += 1;
                     }
@@ -78,9 +78,7 @@ namespace CrystalRush.BotStrategy
                     {
                         bestLocationCoverage = newCoverage;
                         newRadar = tile.Position;
-                        DebugTool.Print("Best TIle", tile.Position, newCoverage);
                     }
-
                 }
             }
 
