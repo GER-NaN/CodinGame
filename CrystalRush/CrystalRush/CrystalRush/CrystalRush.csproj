@@ -45,6 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BotStrategy\Current\RadarClusterStrategy.cs" />
+    <Compile Include="BotStrategy\Current\RadarFillStrategy.cs" />
     <Compile Include="CrystalRushCell.cs" />
     <Compile Include="CrystalRushItem.cs" />
     <Compile Include="CrystalRushItemType.cs" />

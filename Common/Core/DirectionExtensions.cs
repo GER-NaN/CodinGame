@@ -137,6 +137,5 @@ namespace Common.Core
 
             return (Direction)Enum.Parse(typeof(Direction), str);
         }
-        
     }
 }

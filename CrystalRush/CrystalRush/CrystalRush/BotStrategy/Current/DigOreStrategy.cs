@@ -33,11 +33,11 @@ namespace CrystalRush.BotStrategy
 
             //Safe ore does not have a hole on it
             var safeOre = map.FindNearest(tile => tile.Item.SafeOreAvailable(false), robot.Position);
-            var safeOreDistance = safeOre == null ? double.MaxValue : safeOre.Position.DistanceTo(robot.Position);
+            var safeOreDistance = safeOre == null ? double.MaxValue : safeOre.Position.ManhattenDistanceTo(robot.Position);
 
             //Find the closest ore 
             var unsafeOre = map.FindNearest(tile => tile.Item.SafeOreAvailable(true), robot.Position);
-            var unsafeOreDistance = unsafeOre == null ? double.MaxValue : unsafeOre.Position.DistanceTo(robot.Position);
+            var unsafeOreDistance = unsafeOre == null ? double.MaxValue : unsafeOre.Position.ManhattenDistanceTo(robot.Position);
 
             //Do a random dig because we cant see any ore
             var alternative = map.FindNearest(tile => tile.Position.X > AlternativeDigXLimit && !tile.Item.RadarCoverage && tile.Item.SafeToDig(), robot.Position);
@@ -67,46 +67,3 @@ namespace CrystalRush.BotStrategy
         }
     }
 }
-
-
-
-//public string GetMove(TileMap<CrystalRushCell> map, Robot robot)
-//{
-//    var action = "WAIT";
-
-//    //Find the closest ore 
-//    var nearestOre = map.FindNearest(tile => tile.Item.Ore > 0 && tile.Item.MyTrap == false, robot.Position);
-
-//    //Find an un-dug hole in my area
-//    var alternative = map.FindNearest(tile => tile.Item.IsHole == false && tile.Position.X > 0 && tile.Item.MyTrap == false, robot.Position);
-
-
-//    //If we have ore, go to HQ
-//    if (robot.ItemHeld == CrystalRushItemType.Ore)
-//    {
-//        action = $"MOVE 0 {robot.Position.Y} GO:HQ";
-//    }
-//    //If we find ore and can reach it, dig
-//    //An un-specified rule seems to be in place, if you're in the HQ you cannot DIG on adjacent cells (x=1)
-//    else if (nearestOre != null && robot.Position.AdjacentTo(nearestOre.Position, true))
-//    {
-//        action = $"DIG {nearestOre.Position.X} {nearestOre.Position.Y} DIG:ORE";
-//    }
-//    //If we find ore and we cant reach it go there.
-//    else if (nearestOre != null && (!robot.Position.AdjacentTo(nearestOre.Position)))
-//    {
-//        action = $"MOVE {nearestOre.Position.X} {nearestOre.Position.Y} SEARCH:ORE";
-//    }
-//    //If we cant find ore, try digging a non-hole
-//    else if (nearestOre == null && robot.Position.AdjacentTo(alternative.Position, true))
-//    {
-//        action = $"DIG {alternative.Position.X} {alternative.Position.Y} DIG:ALT";
-//    }
-//    //If we cant dig the non-hole, go there
-//    else if (nearestOre == null && (!robot.Position.AdjacentTo(alternative.Position, true)))
-//    {
-//        action = $"MOVE {alternative.Position.X} {alternative.Position.Y} SEARCH:Alt";
-//    }
-
-//    return action;
-//}

@@ -53,7 +53,7 @@
     <Compile Include="Core\DirectionHelper.cs" />
     <Compile Include="Core\Input.cs" />
     <Compile Include="Core\Output.cs" />
-    <Compile Include="Crypto\CaesarCiper.cs" />
+    <Compile Include="Crypto\CaesarCipher.cs" />
     <Compile Include="Crypto\EnigmaMachine.cs" />
     <Compile Include="Graph\Graph.cs" />
     <Compile Include="Graph\GraphNode.cs" />

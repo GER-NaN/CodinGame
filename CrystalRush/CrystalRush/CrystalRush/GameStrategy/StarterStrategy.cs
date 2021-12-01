@@ -56,14 +56,14 @@ namespace CrystalRush.GameStrategy
             var radarOreLimit = 20;
             var needRadar = Map.FindAll(cell => cell.Item.Ore > 0 && !cell.Item.Avoid).Sum(cell => cell.Item.Ore) < radarOreLimit;
 
-            if (needRadar && !Bots.Any(r => r.Strategy is RadarClusterStrategy))
+            if (needRadar && !Bots.Any(r => r.Strategy is RadarFillStrategy))
             {
                 var robot = Bots.Where(r => r.Strategy is DigOreStrategy || r.Strategy is NoStrategy).First();
-                robot.Strategy = new RadarClusterStrategy(Map);
+                robot.Strategy = new RadarFillStrategy();
             }
-            else if (!needRadar && Bots.Any(r => r.Strategy is RadarClusterStrategy))//reset any radar because we dont need them
+            else if (!needRadar && Bots.Any(r => r.Strategy is RadarFillStrategy))//reset any radar because we dont need them
             {
-                foreach (var bot in Bots.Where(r => r.Strategy is RadarClusterStrategy))
+                foreach (var bot in Bots.Where(r => r.Strategy is RadarFillStrategy))
                 {
                     bot.Strategy = new DigOreStrategy(preferSafeOre);
                 }

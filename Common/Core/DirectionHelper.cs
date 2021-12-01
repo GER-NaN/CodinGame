@@ -6,9 +6,11 @@ using System.Threading.Tasks;
 
 namespace Common.Core
 {
+    [Obsolete("Use the DirectionExtension class and the ToDirection(string) function")]
     public static class DirectionHelper
     {
         /// <summary>Parses the string into a Direction. This is useful when reading from input.</summary>
+        [Obsolete("Use the DirectionExtension class and the ToDirection(string) function")]
         public static Direction Parse(string directionString)
         {
             switch (directionString.ToUpper())

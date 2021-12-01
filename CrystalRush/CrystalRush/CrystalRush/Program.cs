@@ -138,10 +138,22 @@ class Program
                 trapDetector.RunAnalysis(map,enemyRobots);
             }
 
-            foreach(var trapPosition in trapDetector)
+            //Clear and reset Radar coverage
+            foreach (var cell in map.Tiles)
             {
-                map.TileAt(trapPosition).Item.Avoid = true;
-                DebugTool.Print("Trap @" + trapPosition);
+                cell.Item.RadarCoverage = false;
+            }
+
+            foreach (var radar in map.FindAll(t => t.Item.IsRadar))
+            {
+                var neighbors = map.GetNeighbors(radar.Position, 4);
+                foreach (var neighbor in neighbors)
+                {
+                    neighbor.Item.RadarCoverage = true;
+                }
+
+                //Mark the radar position as also having coverage
+                map.ItemAt(radar.Position).RadarCoverage = true;
             }
 
             //Mark Dead robots
@@ -154,7 +166,7 @@ class Program
             }
 
             //var test = new TestStrategy(map, myRobots, roundNumber);
-            //test.RunSingleStrategy(new NoStrategy());
+            //test.RunSingleStrategy(new RadarFillStrategy());
 
 
             if (myRobots.Count(b => !b.IsDead()) >= 3)

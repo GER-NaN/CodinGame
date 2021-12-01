@@ -23,9 +23,14 @@ namespace Common.Crypto
         /// for given cipher message)...", https://www.dcode.fr/caesar-cipher </remarks>
         public static string Encode(string plaintext, int shift, char[] alphabet)
         {
-            if(!Alphabet.IsTextInAlphabet(plaintext,alphabet))
+            if( !Alphabet.IsTextInAlphabet(plaintext,alphabet))
             {
                 throw new InvalidOperationException("The plaintext string cannot be constructed using the supplied alphabet array. All characters in the plaintext must exist in the supplied alphabet array.");
+            }
+
+            if(plaintext == string.Empty)
+            {
+                throw new InvalidOperationException("The plaintext string is empty.");
             }
 
             var encodedText = "";

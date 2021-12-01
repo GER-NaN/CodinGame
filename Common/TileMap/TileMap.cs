@@ -42,11 +42,16 @@ namespace Common.TileMap
             Width = map.GetLength(1);
             Height = map.GetLength(0);
 
+            Tiles = new List<Tile<T>>(Width * Height);
+            LookupArray = new Tile<T>[Height, Width];
+
             for (int i = 0; i < Height; i++)//Height (Y)
             {
                 for (int j = 0; j < Width; j++)//Width (X)
                 {
-                    LookupArray[i, j] = new Tile<T>(new Point(j, i), map[i, j]);
+                    var t = new Tile<T>(new Point(j, i), map[i, j]);
+                    Tiles.Add(t);
+                    LookupArray[i, j] = t;
                 }
             }
         }
@@ -63,14 +68,14 @@ namespace Common.TileMap
                 for (int j = 0; j < Width; j++)//Width (X)
                 {
                     var tile = LookupArray[i, j];
-                    if (tile.Position.DistanceTo(position) <= level && tile.Position != position)
+                    if (tile.Position.ManhattenDistanceTo(position) <= level && tile.Position != position)
                     {
                         tiles.Add(tile);
                     }
                 }
             }
             return tiles;
-            //return this.Tiles.Where(t => t.Position.DistanceTo(position) <= level && t.Position != position).ToList();
+            //return this.Tiles.Where(t => t.Position.ManhattenDistanceTo(position) <= level && t.Position != position).ToList();
         }
 
         /// <summary>Gets neighboring cells based on distance from the position and the predicate condition</summary>
@@ -86,14 +91,14 @@ namespace Common.TileMap
                 for (int j = 0; j < Width; j++)//Width (X)
                 {
                     var tile = LookupArray[i, j];
-                    if (tile.Position.DistanceTo(position) <= level && tile.Position != position && predicate.Invoke(tile) )
+                    if (tile.Position.ManhattenDistanceTo(position) <= level && tile.Position != position && predicate.Invoke(tile) )
                     {
                         tiles.Add(tile);
                     }
                 }
             }
             return tiles;
-            //return this.Tiles.Where(predicate).Where(t => t.Position.DistanceTo(position) <= level && t.Position != position).ToList();
+            //return this.Tiles.Where(predicate).Where(t => t.Position.ManhattenDistanceTo(position) <= level && t.Position != position).ToList();
         }
 
         /// <summary>Finds all tiles with the item in it.</summary>
@@ -192,9 +197,9 @@ namespace Common.TileMap
                     var tile = LookupArray[i, j];
                     if (predicate.Invoke(tile))
                     {
-                        if(p.DistanceTo(tile.Position) < nearestDistance)
+                        if(p.ManhattenDistanceTo(tile.Position) < nearestDistance)
                         {
-                            nearestDistance = p.DistanceTo(tile.Position);
+                            nearestDistance = p.ManhattenDistanceTo(tile.Position);
                             nearest = tile;
                         }
                     }
@@ -202,7 +207,7 @@ namespace Common.TileMap
             }
             return nearest;
             //var tiles = Tiles.Where(predicate);
-            //return tiles.OrderBy(tile => p.DistanceTo(tile.Position)).FirstOrDefault();
+            //return tiles.OrderBy(tile => p.ManhattenDistanceTo(tile.Position)).FirstOrDefault();
         }
 
 

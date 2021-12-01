@@ -48,7 +48,7 @@ namespace CrystalRush
                 {
 
                     //New holes are highly suspect
-                    var newHoles = map.FindAll(cell => cell.Item.IsHole && cell.Position.DistanceTo(bot.Position) <= 1 && !ExistingHoles.Contains(cell.Position));
+                    var newHoles = map.FindAll(cell => cell.Item.IsHole && cell.Position.ManhattenDistanceTo(bot.Position) <= 1 && !ExistingHoles.Contains(cell.Position));
                     foreach(var cell in newHoles)
                     {
                         Traps.Add(cell.Position);

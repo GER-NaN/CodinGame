@@ -32,6 +32,15 @@ namespace Common.StandardTypeExtensions
             return Math.Sqrt(Math.Pow(p2.X - p1.X, 2) + Math.Pow(p2.Y - p1.Y, 2));
         }
 
+        /// <summary>Calculates the Distance from p1 to p2 using Manhatten formula</summary>
+        /// <param name="p1">The starting point</param>
+        /// <param name="p2">The ending point</param>
+        /// <returns></returns>
+        public static double ManhattenDistanceTo(this Point p1, Point p2)
+        {
+            return Math.Abs(p1.X - p2.X) + Math.Abs(p1.Y - p2.Y);
+        }
+
         /// <summary>Checks if the Point is adjacent to another point in one of the standard directinos (Up, Down, Left, Right or North, South, East, West)</summary>
         /// <param name="p1">The starting point</param>
         /// <param name="p2">The Point to check</param>
