@@ -29,7 +29,7 @@ namespace CrystalRush.BotStrategy
         //TODO: figure out safe ore logic
         public string GetMove(TileMap<CrystalRushCell> map, Robot robot)
         {
-            var action = "WAIT";
+            var action = "WAIT broken";
 
             //Safe ore does not have a hole on it
             var safeOre = map.FindNearest(tile => tile.Item.SafeOreAvailable(false), robot.Position);
@@ -42,10 +42,17 @@ namespace CrystalRush.BotStrategy
             //Do a random dig because we cant see any ore
             var alternative = map.FindNearest(tile => tile.Position.X > AlternativeDigXLimit && !tile.Item.RadarCoverage && tile.Item.SafeToDig(), robot.Position);
 
+            //Fake Pickup at HQ
+            var fakePickup = (new Random()).Next(1, 100) < 20; //20% chance to fake a pickup
+
             //If we have ore, go to HQ
             if (robot.ItemHeld == CrystalRushItemType.Ore)
             {
                 action = $"MOVE 0 {robot.Position.Y} d:hq";
+            }
+            else if(robot.AtHeadquarters() && fakePickup)
+            {
+                action = $"WAIT d:fp";
             }
             else if (PreferSafeOre && safeOre != null)
             {

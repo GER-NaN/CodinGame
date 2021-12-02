@@ -127,7 +127,7 @@ class Program
             }
 
             /*****************************************************************************
-             * Game Logic
+             * TRAP DETECTION
              *****************************************************************************/
             if (trapDetector == null)
             {
@@ -143,7 +143,9 @@ class Program
                 }
             }
 
-            //Clear and reset Radar coverage
+            /*****************************************************************************
+             * RADAR COVERAGE
+             *****************************************************************************/
             foreach (var cell in map.Tiles)
             {
                 cell.Item.RadarCoverage = false;
@@ -161,7 +163,9 @@ class Program
                 map.ItemAt(radar.Position).RadarCoverage = true;
             }
 
-            //Mark Dead robots
+            /*****************************************************************************
+             * DEAD ROBOTS
+             *****************************************************************************/
             foreach (var robot in myRobots)
             {
                 if (robot.IsDead())
@@ -170,6 +174,27 @@ class Program
                 }
             }
 
+
+
+            /*****************************************************************************
+             * Calculate Metrics
+             *****************************************************************************/
+             //Percentage of map I have covered
+            var radarCoverage = map.FindAll(t => t.Item.RadarCoverage).Count / (double)map.Tiles.Count();
+            //Tiles that have Ore which is known to be safe
+            var safeOreCells = map.FindAll(t => !t.Item.IsHole && t.Item.Ore > 0).Count();
+            //All tiles with ore that we dont suspect as traps
+            var unsafeOreCells = map.FindAll(t => !t.Item.Avoid && t.Item.Ore > 0).Count();
+
+            DebugTool.Print($"Stats>c:{radarCoverage.ToString("P")},so:{safeOreCells},uo:{unsafeOreCells}");
+
+
+
+
+
+            /*****************************************************************************
+             * STRATEGY
+             *****************************************************************************/
             //var test = new TestStrategy(map, myRobots, roundNumber);
             //test.RunSingleStrategy(new NoStrategy());
 

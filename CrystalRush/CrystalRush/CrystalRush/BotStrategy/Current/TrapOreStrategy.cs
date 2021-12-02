@@ -13,7 +13,7 @@ namespace CrystalRush.BotStrategy
     {
         public string GetMove(TileMap<CrystalRushCell> map, Robot robot)
         {
-            var action = "WAIT";
+            var action = "WAIT broken";
 
             //Find ore that doesnt have a hole on it
             var freshOre = map.FindNearest(tile => tile.Item.Ore > 0 && !tile.Item.IsHole, robot.Position);

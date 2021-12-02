@@ -48,7 +48,7 @@ namespace CrystalRush
                 else if (placedItem && BotsCurrentlyTracking.Contains(bot.Id))
                 {
 
-                    //New holes are highly suspect
+                    //New holes are highly suspect (may be useful later for fine tuning)
                     var newHoles = map.FindAll(cell => cell.Item.IsHole && cell.Position.ManhattenDistanceTo(bot.Position) <= 1 && !ExistingHoles.Contains(cell.Position));
                     foreach(var cell in newHoles)
                     {
@@ -57,7 +57,8 @@ namespace CrystalRush
                     }
 
                     //Also mark adjacent holes
-                    var adjacentHoles = map.GetNeighbors(bot.Position, 1,tile => tile.Item.IsHole);
+                    //var adjacentHoles = map.GetNeighbors(bot.Position, 1,tile => tile.Item.IsHole);
+                    var adjacentHoles = map.FindAll(cell => cell.Item.IsHole && cell.Position.ManhattenDistanceTo(bot.Position) <= 1);
                     foreach(var hole in adjacentHoles)
                     {
                         Traps.Add(hole.Position);
