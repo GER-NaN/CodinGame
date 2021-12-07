@@ -13,11 +13,6 @@ namespace CrystalRush.BotStrategy
     /// <summary> A DIG ore strategy where it prefers safe ore</summary>
     public class DigOreStrategy : IRobotStrategy
     {
-        /// <summary>
-        /// When doing an alternative search, the limit on where they should start searching. This can be used to avoid the HQ area which is often empty.
-        /// </summary>
-        private int AlternativeDigXLimit = 5;
-
         /// <summary>Should the BOT prefer safe ore (un-dug). If false, the bot will pick the closest ore to grab</summary>
         private readonly bool PreferSafeOre;
 
@@ -39,8 +34,16 @@ namespace CrystalRush.BotStrategy
             var unsafeOre = map.FindNearest(tile => tile.Item.SafeOreAvailable(true), robot.Position);
             var unsafeOreDistance = unsafeOre == null ? double.MaxValue : unsafeOre.Position.ManhattenDistanceTo(robot.Position);
 
-            //Do a random dig because we cant see any ore
-            var alternative = map.FindNearest(tile => tile.Position.X > AlternativeDigXLimit && !tile.Item.RadarCoverage && tile.Item.SafeToDig(), robot.Position);
+            //Alt1 = Clean hole, not in radar, in our specified zone
+            var alternative1 = map.FindNearest(tile => tile.Position.X > 0 && !tile.Item.RadarCoverage && tile.Item.SafeToDig() && tile.Position.Y >= robot.YStart && tile.Position.Y < robot.YStart + 3, robot.Position);
+
+            //Alt2 = Clean hole, not in radar
+            var alternative2 = map.FindNearest(tile => tile.Position.X > 0 && tile.Item.SafeToDig() && !tile.Item.RadarCoverage, robot.Position);
+
+            //Alt3 = Any clean hole (last hope)
+            var alternative3 = map.FindNearest(tile => tile.Position.X > 0 && tile.Item.SafeToDig(), robot.Position);
+
+
 
             //Fake Pickup at HQ
             var fakePickup = (new Random()).Next(1, 100) < 20; //20% chance to fake a pickup
@@ -64,10 +67,20 @@ namespace CrystalRush.BotStrategy
                 action = $"DIG {unsafeOre.Position.X} {unsafeOre.Position.Y} d:u";
                 unsafeOre.Item.BotsAssignedToDig += 1;
             }
-            else if(alternative != null)
+            else if(alternative1 != null)
             {
-                action = $"DIG {alternative.Position.X} {alternative.Position.Y} d:a";
-                alternative.Item.BotsAssignedToDig += 1;
+                action = $"DIG {alternative1.Position.X} {alternative1.Position.Y} d:a1";
+                alternative1.Item.BotsAssignedToDig += 1;
+            }
+            else if (alternative2 != null)
+            {
+                action = $"DIG {alternative2.Position.X} {alternative2.Position.Y} d:a2";
+                alternative2.Item.BotsAssignedToDig += 1;
+            }
+            else if (alternative3 != null)
+            {
+                action = $"DIG {alternative3.Position.X} {alternative3.Position.Y} d:a3";
+                alternative3.Item.BotsAssignedToDig += 1;
             }
 
             return action;

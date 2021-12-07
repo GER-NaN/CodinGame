@@ -40,25 +40,28 @@ namespace CrystalRush
                 var pickedUp = botPaused && bot.AtHeadquarters();
                 var placedItem = botPaused && !pickedUp;
 
+                //New holes are highly suspect (may be useful later for fine tuning)
+                var newHoles = map.FindAll(cell => cell.Item.IsHole && cell.Position.ManhattenDistanceTo(bot.Position) <= 1 && !ExistingHoles.Contains(cell.Position));
+
+                //Traps can be placed into adjacent holes as well
+                var adjacentHoles = map.FindAll(cell => cell.Item.IsHole && cell.Position.ManhattenDistanceTo(bot.Position) <= 1);
+
+                //If they stoped but there are no holes, its a fake plant and we need to continue tracking them
+                var fakePlant = ((newHoles.Count + adjacentHoles.Count == 0) && placedItem);
+
                 if (pickedUp)
                 {
                     BotsCurrentlyTracking.Add(bot.Id);
                     DebugTool.Print(bot.Id, "picked up", " ");
                 }
-                else if (placedItem && BotsCurrentlyTracking.Contains(bot.Id))
+                else if (placedItem && BotsCurrentlyTracking.Contains(bot.Id) && !fakePlant)
                 {
-
-                    //New holes are highly suspect (may be useful later for fine tuning)
-                    var newHoles = map.FindAll(cell => cell.Item.IsHole && cell.Position.ManhattenDistanceTo(bot.Position) <= 1 && !ExistingHoles.Contains(cell.Position));
-                    foreach(var cell in newHoles)
+                    foreach (var cell in newHoles)
                     {
                         Traps.Add(cell.Position);
                         DebugTool.Print("Trap @", cell.Position, " ");
                     }
 
-                    //Also mark adjacent holes
-                    //var adjacentHoles = map.GetNeighbors(bot.Position, 1,tile => tile.Item.IsHole);
-                    var adjacentHoles = map.FindAll(cell => cell.Item.IsHole && cell.Position.ManhattenDistanceTo(bot.Position) <= 1);
                     foreach(var hole in adjacentHoles)
                     {
                         Traps.Add(hole.Position);
