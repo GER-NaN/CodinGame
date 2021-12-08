@@ -4,13 +4,14 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{19AC9EF6-49C3-4ADE-A06B-C9DC856BC7CA}</ProjectGuid>
+    <ProjectGuid>{27712758-43E9-4AE5-B9B6-12C9E060CAE7}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>Minify</RootNamespace>
-    <AssemblyName>Minify</AssemblyName>
+    <RootNamespace>CodeVsZombies</RootNamespace>
+    <AssemblyName>CodeVsZombies</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -49,5 +50,14 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\Common\Common.csproj">
+      <Project>{d1cf492b-2577-4368-84b4-d74a548ed166}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>C:\Source\Repos\SourceCombiner\SourceCombiner\SourceCombiner\bin\Debug\SourceCombiner.exe "C:\Source\Repos\CodinGame\Puzzles\CodeVsZombies\CodeVsZombies\CodeVsZombies.sln" c:\temp\codevszombies.txt true</PostBuildEvent>
+  </PropertyGroup>
 </Project>
