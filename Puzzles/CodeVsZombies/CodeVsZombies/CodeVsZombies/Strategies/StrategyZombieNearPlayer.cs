@@ -13,9 +13,9 @@ namespace CodeVsZombies.Strategies
     {
         public string GetMove(GameData gameData)
         {
-            var zombieToKill = gameData.Zombies.OrderBy(z => z.DistanceTo(gameData.Player)).First();
+            var zombieToKill = gameData.Zombies.OrderBy(z => z.Item1.DistanceTo(gameData.Player)).First();
 
-            return zombieToKill.X + " " + zombieToKill.Y;
+            return zombieToKill.Item1.X + " " + zombieToKill.Item1.Y;
         }
     }
 }

@@ -11,9 +11,9 @@ namespace CodeVsZombies
     {
         public readonly Point Player;
         public readonly List<Point> Humans;
-        public readonly List<Point> Zombies;
+        public readonly List<Tuple<Point,Point>> Zombies;
 
-        public GameData(Point player, List<Point> humans, List<Point> zombies)
+        public GameData(Point player, List<Point> humans, List<Tuple<Point, Point>> zombies)
         {
             Player = player;
             Humans = humans;

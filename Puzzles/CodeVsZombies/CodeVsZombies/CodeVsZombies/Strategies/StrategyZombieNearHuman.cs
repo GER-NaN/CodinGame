@@ -14,7 +14,7 @@ namespace CodeVsZombies.Strategies
         public string GetMove(GameData gameData)
         {
             //Default zombie
-            var zombieToKill = gameData.Zombies.OrderBy(z => z.DistanceTo(gameData.Player)).First();
+            var zombieToKill = gameData.Zombies.OrderBy(z => z.Item1.DistanceTo(gameData.Player)).First();
 
             //Find the zombie that is closest to a human
             double minDistance = double.MaxValue;
@@ -23,15 +23,15 @@ namespace CodeVsZombies.Strategies
             {
                 foreach(var zombie in gameData.Zombies)
                 {
-                    if(zombie.DistanceTo(human) < minDistance)
+                    if(zombie.Item1.DistanceTo(human) < minDistance)
                     {
-                        minDistance = zombie.DistanceTo(human);
+                        minDistance = zombie.Item1.DistanceTo(human);
                         zombieToKill = zombie;
                     }
                 }
             }
 
-            return zombieToKill.X + " " + zombieToKill.Y;
+            return zombieToKill.Item1.X + " " + zombieToKill.Item1.Y;
         }
     }
 }

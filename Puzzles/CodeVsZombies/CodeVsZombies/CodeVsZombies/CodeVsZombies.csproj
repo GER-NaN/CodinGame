@@ -49,8 +49,10 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Strategies\StrategySaveOneHuman.cs" />
+    <Compile Include="Strategies\StrategySimulateRounds.cs" />
     <Compile Include="Strategies\StrategyZombieNearPlayer.cs" />
     <Compile Include="Strategies\StrategyZombieNearHuman.cs" />
+    <Compile Include="RoundSimulator.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

@@ -34,7 +34,7 @@ namespace CodeVsZombies
                     humans.Add(new Point(humanX, humanY));
                 }
 
-                List<Point> zombies = new List<Point>();
+                List<Tuple<Point, Point>> zombies = new List<Tuple<Point, Point>>();
                 int zombieCount = int.Parse(Console.ReadLine());
                 for (int i = 0; i < zombieCount; i++)
                 {
@@ -44,14 +44,14 @@ namespace CodeVsZombies
                     int zombieY = int.Parse(inputs[2]);
                     int zombieXNext = int.Parse(inputs[3]);
                     int zombieYNext = int.Parse(inputs[4]);
-                    zombies.Add(new Point(zombieX, zombieY));
+                    zombies.Add(new Tuple<Point, Point>(new Point(zombieX, zombieY), new Point(zombieXNext, zombieYNext)));
                 }
 
                 /********************************************************************/
 
                 var gameData = new GameData(me, humans, zombies);
 
-                IStrategy strategy = new StrategySaveOneHuman();
+                IStrategy strategy = new StrategySimulateRounds();
 
                 Console.WriteLine(strategy.GetMove(gameData));
             }

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace CodeVsZombies.Strategies
 {
-    //Prevents the loosing condition of every human dying. This is done by sitting at 1 human and waiting (doesnt work in all cases)
+    //Prevents the loosing condition of every human dying. This is done by sitting at 1 human and waiting (doesnt work in cases that require prediction)
     //Score: 31740 - 95%
     public class StrategySaveOneHuman : IStrategy
     {
