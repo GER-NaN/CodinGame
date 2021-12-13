@@ -1,4 +1,5 @@
-﻿using Common.StandardTypeExtensions;
+﻿using CodeVsZombies.Strategies;
+using Common.StandardTypeExtensions;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -11,20 +12,16 @@ namespace CodeVsZombies
 {
     class Program
     {
-        static Random random = new Random(Guid.NewGuid().GetHashCode());
         static void Main(string[] args)
         {
             string[] inputs;
 
-            // game loop
             while (true)
             {
-
                 inputs = Console.ReadLine().Split(' ');
                 int x = int.Parse(inputs[0]);
                 int y = int.Parse(inputs[1]);
                 Point me = new Point(x, y);
-
 
                 List<Point> humans = new List<Point>();
                 int humanCount = int.Parse(Console.ReadLine());
@@ -50,9 +47,13 @@ namespace CodeVsZombies
                     zombies.Add(new Point(zombieX, zombieY));
                 }
 
-                var zombieToKill = zombies.OrderBy(z => z.DistanceTo(me)).First();
+                /********************************************************************/
 
-                Console.WriteLine(zombieToKill.X + " " + zombieToKill.Y);
+                var gameData = new GameData(me, humans, zombies);
+
+                IStrategy strategy = new StrategySaveOneHuman();
+
+                Console.WriteLine(strategy.GetMove(gameData));
             }
         }
     }
